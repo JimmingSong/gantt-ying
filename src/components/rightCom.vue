@@ -426,14 +426,14 @@ export default {
             } else {
                 this.width.total = maxAndMin * this.config.width;
             }
-            let add = this.config.width - rangNum;
+            let add = this.config.width - w % this.config.width;
             // 容器的高度 = 数据的数量 * 配置的每项的高度
             this.content.height = this.data.length * this.config.height;
             this.line.y2 = h + 18;
             // 内容区域的宽度
             this.content.width = w;
             // 时间轴容器的宽度
-            this.width.date = w + add;
+            this.width.date = w + add + this.config.width;
         },
         /**
          * 根据配置来格式化 时间轴的显示 模式
@@ -487,12 +487,13 @@ export default {
             this.$set(this, 'cells', arr);
         },
         /**
-             * 计算时间轴的 显示
-             */
+         * 计算时间轴的 显示
+         */
         showDateText (scrollLeft) {
             let scale = (this.content.width - 30 - this.scrollWidth) / this.width.total; // 滚动条的区间与总长的比例
             let currentFirst = moment(scrollLeft / scale * (this.calcData.range / this.config.width) + this.calcData.min).valueOf();
-            this.left.date = this.left.content % this.width.date % this.config.width;
+            console.log(this.left.content);
+            this.left.date = -scrollLeft / scale % this.width.date % this.config.width;
             this.left.scroll = scrollLeft;
             if (this.left.scroll === 0) {
                 this.calcCells();
@@ -504,7 +505,6 @@ export default {
             let dateTime = moment(data.start).valueOf();
             let scale = (this.content.width - 30 - this.scrollWidth) / this.width.total; // 滚动条的区间与总长的比例
             let scrollLeft = (dateTime - this.calcData.min) / (this.calcData.range / this.config.width) * scale;
-            console.log(scrollLeft);
             this.showDateText(scrollLeft);
         },
         /* ------------------------------------------------scroll-------------------------------------------------- */
