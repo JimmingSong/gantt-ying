@@ -287,6 +287,7 @@ export default {
                 width: 0
             },
             scroll: {
+                preLeft: 0,
                 width: 0,
                 left: 0
             }
@@ -347,8 +348,16 @@ export default {
                 } else if (width + scrollLeft >= this.scroll.width) { // 防止右边被拖过头
                     scrollLeft = this.scroll.width - width;
                 }
+                this.scroll.preLeft = this.scroll.left;
                 this.scroll.left = scrollLeft;
-                this.showDateText(scrollLeft);
+                // 往左拖动
+                if (this.scroll.preLeft - this.scroll.left > 0) {
+                    this.showDateText(scrollLeft, true);
+                } else{
+                    // 往右拖动
+                    this.showDateText(scrollLeft, false);
+                }
+                // this.showDateText(scrollLeft);
                 scrollBox.onmouseup = () => {
                     scrollBox.onmousemove = null;
                 };
@@ -365,7 +374,6 @@ export default {
             if (this.timeScale.left < -this.config.width) {
                 this.timeScale.left = this.timeScale.left + this.config.width;
             }
-            console.log(this.timeScale.left, scrollLeft / scale, scale, this.content.width, this.global.width);
             if (this.scroll.left === 0) {
                 this.calcCells();
                 return;
