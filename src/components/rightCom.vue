@@ -364,13 +364,15 @@ export default {
         scrollWidth () {
             // 最大时间 与 最小时间 中 计算所得的做大的容器的宽度
             let aWidth = this.width.total;
+            let contentWidth = this.content.width;
             let scrollWidth = this.content.width - 30;
-            let scale = scrollWidth / aWidth;
+            let scale = contentWidth / aWidth;
             let width = scale * scrollWidth;
+            console.log(width);
             if (width < 100 && width > 0) {
                 // this.scroll.scale = Math.floor(50 / width);
                 width = 50;
-            } else if (width > this.content.width) {
+            } else if (width >= this.content.width) {
                 width = scrollWidth;
             }
             return width;
@@ -418,13 +420,13 @@ export default {
             // 最大时间差与最小时间差能有多少个时间差
             let maxAndMin = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
             // 如果时间差的时间段 比 屏幕的少 要补齐
-            if (maxAndMin < rangNum) {
-                let num = rangNum - maxAndMin + 1;
-                maxAndMin = (rangNum - maxAndMin + 1) * this.calcData.range;
+            if (maxAndMin <= rangNum) {
+                let num = rangNum + 1;
+                maxAndMin = num * this.calcData.range;
                 this.$emit('updateCalcDataMax', maxAndMin);
                 this.width.total = num * this.config.width;
             } else {
-                this.width.total = maxAndMin * this.config.width;
+                this.width.total = (maxAndMin + 1) * this.config.width;
             }
             let add = this.config.width - w % this.config.width;
             // 容器的高度 = 数据的数量 * 配置的每项的高度
@@ -490,16 +492,22 @@ export default {
          * 计算时间轴的 显示
          */
         showDateText (scrollLeft) {
-            let scale = (this.content.width - 30 - this.scrollWidth) / this.width.total; // 滚动条的区间与总长的比例
+            let scale = this.content.width / this.width.total; // 滚动条的区间与总长的比例
             let currentFirst = moment(scrollLeft / scale * (this.calcData.range / this.config.width) + this.calcData.min).valueOf();
-            console.log(this.left.content);
-            this.left.date = -scrollLeft / scale % this.width.date % this.config.width;
+            this.left.date = -(scrollLeft / scale) % this.width.date % this.config.width;
+            // console.log(this.left.date);
             this.left.scroll = scrollLeft;
             if (this.left.scroll === 0) {
                 this.calcCells();
                 return;
             }
+            console.log(currentFirst, this.calcData.min, (currentFirst - this.calcData.min) / this.calcData.range);
+            // 判定是否重新机选日期
+            // let isChange = Math.floor((currentFirst - this.calcData.min) / this.calcData.range);
+            // if (isChange !== this.scroll.change) {
+            //     this.scroll.change = isChange;
             this.calcCells(currentFirst);
+            // }
         },
         calcScrollLeftAccordingDate (data) {
             let dateTime = moment(data.start).valueOf();

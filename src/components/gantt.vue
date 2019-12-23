@@ -126,9 +126,9 @@ export default {
                             return new Date(b.start).getTime() - new Date(a.start).getTime();
                         });
                         minDate = moment(sortResult.slice(-1)[0].start).valueOf();
-                        maxDate = moment(sortResult[0].start).valueOf();
+                        maxDate = moment(sortResult[0].stop).valueOf();
                     }
-                    
+
                     this.calcData.max = maxDate;
                     this.calcData.min = minDate;
                 }
