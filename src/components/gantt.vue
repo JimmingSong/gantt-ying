@@ -16,16 +16,14 @@
             @calcContentBoxSize="calcContentBoxSize"
             @expandRow="expandRow"
         ></leftCom>
-        <div class="gantt-right" ref="right">
-            <rightCom
-                ref="rightBox"
-                :data="jsonData"
-                :config="config"
-                :calcData="calcData"
-                @dataSubmit="handleSubmit"
-                @scrollEvent="scrollEvent"
-                @updateRange="updateRange" />
-        </div>
+        <rightCom
+            ref="rightBox"
+            :data="jsonData"
+            :config="config"
+            :calcData="calcData"
+            @dataSubmit="handleSubmit"
+            @scrollEvent="scrollEvent"
+            @updateRange="updateRange" />
     </div>
 </template>
 
