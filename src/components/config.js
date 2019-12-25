@@ -5,7 +5,7 @@ export default {
         stop: 'stop'
     },
     width: 200,
-    height: 30,
+    height: 22,
     space: 6,
     range: 600000,
     backgroundColor: '#999',

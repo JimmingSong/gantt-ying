@@ -113,11 +113,8 @@ export default {
             }
         },
         expandRow (row, expanded) {
-            let obj = {
-                expanded,
-                row
-            };
-            this.$emit('expandRow', obj);
+            row.expand = expanded;
+            this.$emit('expandRow', row);
         }
     }
 };
