@@ -1,4 +1,4 @@
-<style scoped>
+<style scoped lang='less'>
   @import "ganttCom.css";
   .tool {
       display: flex;
@@ -12,7 +12,7 @@
       z-index: 100;
       background-image: linear-gradient(-90deg, #404040, #404040 70%, rgba(64, 64, 64, 0) 100%);
 
-      & > i {
+      &>i {
           margin-right: 5px;
       }
   }
@@ -30,6 +30,7 @@
             @rowDoubleClick="showDialog"
             @updateRightStyle="updateRightStyle"
             @calcContentBoxSize="calcContentBoxSize"
+            @leftScrollEvent="leftScrollEvent"
         ></leftCom>
         <rightCom
             ref="rightBox"
@@ -101,6 +102,9 @@ export default {
         scrollEvent (top) {
             this.$refs.leftBox.scrollEvent(top);
         },
+        leftScrollEvent (top) {
+            this.$refs.rightBox.scrollEvent(top);
+        },
         /**
          * tree 的双击事件
          */
@@ -167,7 +171,7 @@ export default {
                     maxDate: 0
                 };
                 this.getMinAndMaxTime(deepCopy, result);
-                minDate = result.minDate - this.calcData.range;
+                minDate = result.minDate;
                 maxDate = result.maxDate;
             }
             this.calcData.max = maxDate;

@@ -23,7 +23,6 @@
             :data="leftBaseData"
             height="100%"
             border
-            stripe
             :indent="8"
             row-key="id"
             :header-row-style="{height: headerHeight}"
@@ -116,6 +115,17 @@ export default {
             row.expand = expanded;
             this.$emit('expandRow', row);
         }
+    },
+    mounted () {
+        this.$nextTick().then(() => {
+            let box = document.querySelector('.el-table__fixed-body-wrapper');
+            console.log(box);
+            box.addEventListener('scroll', () => {
+                let scrollTop = box.scrollTop;
+                this.$emit('leftScrollEvent', scrollTop);
+            })
+        })
+        
     }
 };
 </script>

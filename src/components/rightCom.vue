@@ -2,49 +2,54 @@
     .right {
         position: relative;
         background: #2d2d2d;
-        width: 100%;
+        width: 85%;
         height: 100%;
-        overflow: auto;
-        &-box {
-            height: 100%;
-            &-date{
-                position: relative;
-                width: 100%;
-                height: 30px;
-                overflow-x: hidden;
-                &-text {
-                    position: absolute;
-                    bottom: 10px;
-                    font-size: 14px;
-                }
-
-                &-ticks {
-                    position: absolute;
-                    left: 0;
-                    bottom: 3px;
-                    width: 100%;
-                    background-image: linear-gradient(90deg, #b5b5b5 1px, transparent 1px, transparent 100%);
-                    background-repeat: repeat-x;
-                }
-
-                &-hight {
-                    height: 10px;
-                    background-size: 200px 100%;
-                }
-
-                &-short {
-                    height: 5px;
-                    background-size: 5px 100%;
-                }
+        overflow-x: hidden;
+        .right-box-scroll {
+            width: 100%;
+            overflow: hidden;
+        }
+        .right-box-date{
+            position: relative;
+            width: 100%;
+            height: 30px;
+            &-text {
+                position: absolute;
+                bottom: 10px;
+                font-size: 14px;
             }
+
+            &-ticks {
+                position: absolute;
+                left: 0;
+                bottom: 3px;
+                width: 100%;
+                background-image: linear-gradient(90deg, #b5b5b5 1px, transparent 1px, transparent 100%);
+                background-repeat: repeat-x;
+            }
+
+            &-hight {
+                height: 10px;
+                background-size: 200px 100%;
+            }
+
+            &-short {
+                height: 5px;
+                background-size: 5px 100%;
+            }
+        }
+        &-box {
+            width: 100%;
+            height: calc(100% - 30px);
+            overflow: auto;
         }
     }
 </style>
 
 <template>
-    <div class="right" ref="rightCon">
-        <div class="right-box" :style="{width: calcData.boxWidth + 'px'}" ref="content">
-            <div class="right-box-date" ref="dateBox">
+    <div class="right">
+        <div class="right-box-scroll" ref="dateScroll">
+            <div class="right-box-date" ref="dateBox" :style="{width: calcData.boxWidth + 'px'}">
                 <div
                     v-for="(item,dex) in dateList"
                     class="right-box-date-text"
@@ -53,10 +58,13 @@
                 </div>
                 <div class="right-box-date-ticks right-box-date-hight" :style="{backgroundSize: config.width + 'px 100%;'}"></div>
                 <div class="right-box-date-ticks right-box-date-short"></div>
-
             </div>
-            <div style="height: calc(100% - 30px);">
-                <rectCom v-for="(item,dex) in data" :key="dex" :item="item" :config="config" />
+        </div>
+        <div class="right-box" ref="rightCon">
+            <div class="right-box-scroll" :style="{width: calcData.boxWidth + 'px'}">
+                <div class="right-box-range" style="height: calc(100% - 30px);" ref="content">
+                    <rectCom v-for="(item,dex) in data" :key="dex" :item="item" :config="config" />
+                </div>
             </div>
         </div>
     </div>
@@ -145,6 +153,9 @@ export default {
         },
         dateShowLeft (millisecond, dex) {
             return dex * this.config.width;
+        },
+        scrollEvent (top) {
+            this.$refs.rightCon.scroll(0, top);
         }
     },
     mounted () {
@@ -154,6 +165,8 @@ export default {
         let content = this.$refs.rightCon;
         content.addEventListener('scroll', () => {
             let top = content.scrollTop;
+            let left = content.scrollLeft;
+            this.$refs.dateScroll.scroll(left, 0)
             this.$emit('scrollEvent', top);
         });
     },
