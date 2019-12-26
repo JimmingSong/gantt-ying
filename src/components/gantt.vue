@@ -9,7 +9,7 @@
       right: 0;
       height: 30px;
       width: 100px;
-      z-index: 100;
+      z-index: 10;
       background-image: linear-gradient(-90deg, #404040, #404040 70%, rgba(64, 64, 64, 0) 100%);
 
       &>i {
@@ -42,8 +42,9 @@
             @scrollEvent="scrollEvent"
             @updateRange="updateRange" />
         <div class="tool">
-            <i class="el-icon-zoom-in" @click="handleRange('up')"></i>
-            <i class="el-icon-zoom-out" @click="handleRange('down')"></i>
+            <i class="el-icon-zoom-in" @click="handleRange('down')"></i>
+            <i class="el-icon-zoom-out" @click="handleRange('up')"></i>
+            <slot name="tool"></slot>
         </div>
     </div>
 </template>
@@ -66,6 +67,9 @@ export default {
     },
     data () {
         return {
+            cacheData: {
+                maxTime: new Date().getTime()
+            },
             baseData: {
                 data: []
             },
@@ -118,15 +122,15 @@ export default {
         rangeChartShow (index) {
             let data = this.baseData.data[index];
             console.log(data);
-            // this.$refs.rightBox.calcScrollLeftAccordingDate(data);
         },
         /**
          * range 变化 触发事件
          */
         updateRange (newRange) {
             this.calcData.range = newRange;
-            this.calcData.rangeNum = Math.ceil((this.calcData.max-this.calcData.min)/this.calcData.range);
+            this.calcData.rangeNum = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
             this.calcData.boxWidth = this.calcData.rangeNum * this.config.width;
+            this.calcMaxTime(this.calcData.max);
             this.dealData(this.baseData.data);
             this.$refs.rightBox.calcCells();
         },
@@ -174,28 +178,32 @@ export default {
                 minDate = result.minDate;
                 maxDate = result.maxDate;
             }
-            this.calcData.max = maxDate;
             this.calcData.min = minDate;
-            this.calcData.rangeNum = Math.ceil((this.calcData.max-this.calcData.min)/this.calcData.range);
+            this.calcData.max = maxDate;
+            this.cacheData.maxTime = maxDate;
+            this.calcData.rangeNum = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
             this.calcData.boxWidth = this.calcData.rangeNum * this.config.width;
         },
         mixinToBaseData (reqData, index) {
             if (reqData.children && reqData.children.length > 0) {
-                let dateArray = reqData.children.map(item => {
-                    this.$set(item, 'duration', this.calcDuration(item.start, item.stop));
-                    // item.duration = this.calcDuration(item.start, item.stop);
-                    if (!reqData.duration) this.$set(reqData, 'duration', 0);
-                    reqData.duration += item.duration;
-                    let mixin = {
-                        x: this.calculateX(item),
-                        width: this.calculateWidth(item),
-                        style: this.config.taskStyle
-                    };
-                    this.$set(item, 'mixin', mixin);
-                    return item;
+                // let dateArray = reqData.children.map(item => {
+                //     this.$set(item, 'duration', this.calcDuration(item.start, item.stop));
+                //     // item.duration = this.calcDuration(item.start, item.stop);
+                //     if (!reqData.duration) this.$set(reqData, 'duration', 0);
+                //     reqData.duration += item.duration;
+                //     let mixin = {
+                //         x: this.calculateX(item),
+                //         width: this.calculateWidth(item),
+                //         style: this.config.taskStyle
+                //     };
+                //     this.$set(item, 'mixin', mixin);
+                //     return item;
+                // });
+                // let date = this.sortDate(dateArray);
+                // reqData.start = moment(date[date.length - 1].start).format('YYYY-MM-DD HH:mm:ss');
+                reqData.children.forEach((item, dex) => {
+                    this.mixinToBaseData(item, dex);
                 });
-                let date = this.sortDate(dateArray);
-                reqData.start = moment(date[date.length-1].start).format('YYYY-MM-DD HH:mm:ss');
             }
             // 默认设置全部不展开
             this.$set(reqData, 'expand', false);
@@ -221,13 +229,13 @@ export default {
                 let start = moment(item.start).valueOf();
                 let end = moment(item.stop).valueOf();
                 if (start <= result.minDate) {
-                    result.minDate = start
+                    result.minDate = start;
                 }
                 if (end >= result.maxDate) result.maxDate = end;
                 if (item.children && item.children.length > 0) {
                     this.getMinAndMaxTime(item.children, result);
                 }
-            })
+            });
         },
         /**
          * 计算duration
@@ -287,23 +295,58 @@ export default {
         },
         handleRange (type) {
             let range = this.calcData.range;
-            switch (type) {
-                case 'up':
-                    if (range > 1000 && range < 1000 * 60 * 60) {
-                        range *= 60;
-                    } else if (range === 1000 * 60 * 60) {
-                        range *= 24;
-                    }
-                    break;
-                case 'down':
-                    if (range > 1000 && range <= 1000 * 60 * 60) {
-                        range /= 60;
-                    } else if (range === 1000 * 60 * 60 * 24) {
-                        range /= 24;
-                    }
-                    break;
+            if (type === 'up') {
+                if (this.calcData.range >= 3600000) return;
+                let rangeObj = {
+                    '1000': 2000,
+                    '2000': 5000,
+                    '5000': 10000,
+                    '10000': 20000,
+                    '20000': 30000,
+                    '30000': 60000,
+                    '60000': 120000,
+                    '120000': 180000,
+                    '180000': 300000,
+                    '300000': 600000,
+                    '600000': 1200000,
+                    '1200000': 1800000,
+                    '1800000': 3600000
+                };
+                range = rangeObj[range];
+            } else {
+                if (this.calcData.range <= 1000) return;
+                let rangeObj = {
+                    '2000': 1000,
+                    '5000': 2000,
+                    '10000': 5000,
+                    '20000': 10000,
+                    '30000': 20000,
+                    '60000': 30000,
+                    '120000': 60000,
+                    '180000': 120000,
+                    '300000': 180000,
+                    '600000': 300000,
+                    '1200000': 600000,
+                    '1800000': 1200000,
+                    '3600000': 1800000
+                };
+                range = rangeObj[range];
             }
             this.updateRange(range);
+        },
+        calcMaxTime (maxDate) {
+            let rightBox = this.$refs.rightBox;
+            if (rightBox) {
+                let rightWidth = this.$refs.rightBox.$el.clientWidth;
+                let max = Math.ceil(rightWidth / this.config.width) * this.calcData.range + this.calcData.min;
+                if (maxDate < max) {
+                    this.calcData.max = max;
+                    return max;
+                }
+                this.calcData.max = maxDate;
+                return maxDate;
+            }
+            this.calcData.max = maxDate;
         }
     },
     created () {

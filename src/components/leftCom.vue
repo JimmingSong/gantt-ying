@@ -1,25 +1,36 @@
 <style scoped lang="less">
     .left-container {
         min-width: 200px;
+        /*padding-bottom: 10px;*/
     }
-    .left-table {
+    .gantt-left-table {
         height: 100%;
-    }
-    /deep/.left-table td,/deep/.left-table th {
-        padding: 0;
+        background-color: transparent;
     }
     /deep/.row {
         cursor: pointer;
+        background: transparent;
+    }
+    .gantt-table-cell {
+        border-bottom-color: #4d4d4d;
+        /deep/ & >.cell {
+            line-height: 21px !important;
+        }
     }
     /deep/.row-expand-cover .el-table__expand-icon{
         display: none;
+    }
+    /deep/.gantt-left-table .el-table__body-wrapper{
+        overflow-y: auto !important;
+        overflow-x: scroll;
     }
 </style>
 
 <template>
     <div class="left-container" @mouseout.self="leftBoxOut($event)" @mousemove.self="svgMouseMove($event)" @mousedown.self="svgMouseDown($event)">
         <el-table
-            class="left-table"
+            ref="leftTable"
+            class="gantt-left-table"
             :data="leftBaseData"
             height="100%"
             border
@@ -29,7 +40,8 @@
             :row-style="rowHeight"
             @expand-change="expandRow"
             :row-class-name="rowClassname"
-            :cell-style="{padding: '3px 0 4px 0'}"
+            :cell-style="{padding: '0'}"
+            cell-class-name="gantt-table-cell"
             :header-cell-style="{padding: '3px 0'}"
             @row-click="rowClick"
             @row-dblclick="rowDbClick"
@@ -37,8 +49,6 @@
             <el-table-column
                 v-for="(item, dex) in config.menu"
                 :key="dex"
-                :fixed="dex === 0"
-                :min-width="startTimeColumnWidth(item)"
                 :prop="item.prop"
                 align="center"
                 :label="item.text">
@@ -58,7 +68,7 @@ export default {
     },
     computed: {
         headerHeight () {
-            return this.config.height + 'px';
+            return this.config.headerHeight + 'px';
         },
         rowClassname () {
             if (this.config.childIsShow) {
@@ -69,7 +79,8 @@ export default {
     },
     methods: {
         scrollEvent (top) {
-            document.querySelector('.el-table__fixed-body-wrapper').scroll(0, top);
+            let table = this.$refs.leftTable;
+            table.$el.querySelector('.el-table__body-wrapper').scroll(0, top);
         },
         rowClick (row) {
             this.$emit('rowClick', row.index);
@@ -77,12 +88,8 @@ export default {
         rowDbClick (row) {
             this.$emit('rowDbClick', row.index);
         },
-        startTimeColumnWidth (item) {
-            return item.prop === 'start_date' ? '200' : '100';
-        },
         rowHeight () {
-            return `height: ${this.config.height + 1}px`;
-            // console.log(row, rowIndex);
+            return `height: ${this.config.height}px`;
         },
         leftBoxOut (e) {
             e.target.style.cursor = 'default';
@@ -118,14 +125,12 @@ export default {
     },
     mounted () {
         this.$nextTick().then(() => {
-            let box = document.querySelector('.el-table__fixed-body-wrapper');
-            console.log(box);
-            box.addEventListener('scroll', () => {
-                let scrollTop = box.scrollTop;
+            let table = this.$refs.leftTable.$el.querySelector('.el-table__body-wrapper');
+            table.addEventListener('scroll', () => {
+                let scrollTop = table.scrollTop;
                 this.$emit('leftScrollEvent', scrollTop);
-            })
-        })
-        
+            });
+        });
     }
 };
 </script>

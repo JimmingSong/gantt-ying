@@ -5,7 +5,8 @@ export default {
         stop: 'stop'
     },
     width: 200,
-    height: 22,
+    headerHeight: 30,
+    height: 21,
     space: 6,
     range: 600000,
     backgroundColor: '#999',
@@ -23,5 +24,5 @@ export default {
     taskStyle: {
         cursor: 'default'
     },
-    childIsShow: false
+    childIsShow: true
 };

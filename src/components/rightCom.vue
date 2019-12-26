@@ -1,13 +1,14 @@
 <style lang="less" scoped>
-    .right {
+    .gantt-right {
         position: relative;
-        background: #2d2d2d;
+        background: transparent;
         width: 85%;
         height: 100%;
         overflow-x: hidden;
-        .right-box-scroll {
+        .right-box-date-scroll {
             width: 100%;
             overflow: hidden;
+            background: #404040;
         }
         .right-box-date{
             position: relative;
@@ -16,7 +17,8 @@
             &-text {
                 position: absolute;
                 bottom: 10px;
-                font-size: 14px;
+                font-size: 12px;
+                color: #cccccc;
             }
 
             &-ticks {
@@ -39,16 +41,26 @@
             }
         }
         &-box {
+            position: relative;
             width: 100%;
             height: calc(100% - 30px);
             overflow: auto;
+            transform: scaleX(1);
+        }
+        .right-box-mask {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            height: calc(100% - 42px);
+            background: rgba(36, 36, 36, 0.63);
+            border-right: 1px solid rgb(48, 48, 48);
         }
     }
 </style>
 
 <template>
-    <div class="right">
-        <div class="right-box-scroll" ref="dateScroll">
+    <div class="gantt-right">
+        <div class="right-box-date-scroll" ref="dateScroll">
             <div class="right-box-date" ref="dateBox" :style="{width: calcData.boxWidth + 'px'}">
                 <div
                     v-for="(item,dex) in dateList"
@@ -60,13 +72,14 @@
                 <div class="right-box-date-ticks right-box-date-short"></div>
             </div>
         </div>
-        <div class="right-box" ref="rightCon">
+        <div class="gantt-right-box" ref="rightCon">
             <div class="right-box-scroll" :style="{width: calcData.boxWidth + 'px'}">
                 <div class="right-box-range" style="height: calc(100% - 30px);" ref="content">
                     <rectCom v-for="(item,dex) in data" :key="dex" :item="item" :config="config" />
                 </div>
             </div>
         </div>
+        <div class="right-box-mask" :style="{width: 0 + 'px'}"></div>
     </div>
 </template>
 
@@ -124,9 +137,9 @@ export default {
         calcCells () {
             let arr = [];
             let {min, max} = this.calcData;
+            console.log(moment(max).format('YYYY-MM-DD HH:mm:ss'));
             max = this.calcData.rangeNum * this.calcData.range + min;
-            console.log('更新cells');
-            for (let i = min; i <= max; i+=this.calcData.range) {
+            for (let i = min; i <= max; i += this.calcData.range) {
                 arr.push(i);
             }
             this.$set(this, 'cells', arr);
@@ -160,13 +173,14 @@ export default {
     },
     mounted () {
         this.$nextTick().then(() => {
+            console.log(this.$refs.rightCon.clientWidth);
             this.calcCells();
         });
         let content = this.$refs.rightCon;
         content.addEventListener('scroll', () => {
             let top = content.scrollTop;
             let left = content.scrollLeft;
-            this.$refs.dateScroll.scroll(left, 0)
+            this.$refs.dateScroll.scroll(left, 0);
             this.$emit('scrollEvent', top);
         });
     },
