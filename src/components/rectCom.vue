@@ -49,9 +49,6 @@ export default {
         cutLineY (dex) {
             return this.calcY(dex) + this.config.height;
         }
-    },
-    created () {
-        console.log(this.item);
     }
 };
 </script>

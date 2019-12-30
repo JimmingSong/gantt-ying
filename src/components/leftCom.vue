@@ -27,11 +27,11 @@
 </style>
 
 <template>
-    <div class="left-container" @mouseout.self="leftBoxOut($event)" @mousemove.self="svgMouseMove($event)" @mousedown.self="svgMouseDown($event)">
+    <div class="left-container">
         <el-table
             ref="leftTable"
             class="gantt-left-table"
-            :data="leftBaseData"
+            :data="data"
             height="100%"
             border
             :indent="8"
@@ -45,7 +45,7 @@
             :header-cell-style="{padding: '3px 0'}"
             @row-click="rowClick"
             @row-dblclick="rowDbClick"
-            style="width: 99%">
+            style="width: 100%">
             <el-table-column
                 v-for="(item, dex) in config.menu"
                 :key="dex"

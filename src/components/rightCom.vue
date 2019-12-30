@@ -93,6 +93,7 @@ export default {
         return {
             cells: [], // 时间轴
             boxWidth: 0,
+            nowPos: 0,
             line: {
                 x: 100,
                 y1: 0,
@@ -134,16 +135,18 @@ export default {
         cutLineY (dex) {
             return this.calcY(dex) + this.config.height;
         },
-        calcCells () {
+        calcCells (first = 0) {
             let arr = [];
             let {min, max} = this.calcData;
-            console.log(moment(max).format('YYYY-MM-DD HH:mm:ss'));
             max = this.calcData.rangeNum * this.calcData.range + min;
-            for (let i = min; i <= max; i += this.calcData.range) {
-                arr.push(i);
+            // for (let i = min; i <= max; i += this.calcData.range) {
+            //     arr.push(i);
+            // }
+            for (let i = first; i <= this.config.minRangeNumber + first; i++) {
+                let date = min + this.calcData.range * i;
+                arr.push(date);
             }
             this.$set(this, 'cells', arr);
-            // this.cells = arr;
         },
         /**
          * 根据配置来格式化 时间轴的显示 模式
@@ -164,7 +167,8 @@ export default {
             }
             return moment(second).format(this.config.timeLine.format);
         },
-        dateShowLeft (millisecond, dex) {
+        dateShowLeft (millisecond) {
+            let dex = (millisecond - this.calcData.min) / this.calcData.range;
             return dex * this.config.width;
         },
         scrollEvent (top) {
@@ -173,13 +177,18 @@ export default {
     },
     mounted () {
         this.$nextTick().then(() => {
-            console.log(this.$refs.rightCon.clientWidth);
             this.calcCells();
         });
         let content = this.$refs.rightCon;
         content.addEventListener('scroll', () => {
             let top = content.scrollTop;
             let left = content.scrollLeft;
+            let leftNum = Math.ceil(left / this.config.width);
+            console.log(leftNum);
+            if (this.nowPos !== leftNum) {
+                this.nowPos = leftNum;
+                this.calcCells(Math.ceil(Math.abs(leftNum) - 1));
+            }
             this.$refs.dateScroll.scroll(left, 0);
             this.$emit('scrollEvent', top);
         });

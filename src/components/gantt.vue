@@ -29,7 +29,6 @@
             @rowClick="rangeChartShow"
             @rowDoubleClick="showDialog"
             @updateRightStyle="updateRightStyle"
-            @calcContentBoxSize="calcContentBoxSize"
             @leftScrollEvent="leftScrollEvent"
         ></leftCom>
         <rightCom
@@ -37,7 +36,6 @@
             :data="jsonData"
             :config="config"
             :calcData="calcData"
-            :expandData="expandData"
             @dataSubmit="handleSubmit"
             @scrollEvent="scrollEvent"
             @updateRange="updateRange" />
@@ -73,7 +71,6 @@ export default {
             baseData: {
                 data: []
             },
-            leftBaseData: [],
             rightStyle: {
                 width: '15%'
             },
@@ -81,7 +78,7 @@ export default {
             calcData: {
                 boxWidth: 0,
                 range: defaultConfig.range,
-                rangeNum: 0,
+                rangeNum: defaultConfig.minRangeNumber,
                 max: 0,
                 min: 0
             },
@@ -147,12 +144,8 @@ export default {
          */
         dealData (reqData) {
             if (reqData instanceof Array && reqData.length > 0) {
-                if (!this.calcData.min) {
-                    this.setMinAndMaxTime(reqData);
-                }
-                return reqData.map((item, index) => {
-                    return this.mixinToBaseData(item, index);
-                });
+                this.setMinAndMaxTime(reqData);
+                return this.mixinToBaseData(reqData);
             }
             return [];
         },
@@ -179,46 +172,31 @@ export default {
                 maxDate = result.maxDate;
             }
             this.calcData.min = minDate;
-            this.calcData.max = maxDate;
+            this.calcMaxTime(maxDate);
             this.cacheData.maxTime = maxDate;
+            // 时间刻度的数量
             this.calcData.rangeNum = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
             this.calcData.boxWidth = this.calcData.rangeNum * this.config.width;
         },
-        mixinToBaseData (reqData, index) {
-            if (reqData.children && reqData.children.length > 0) {
-                // let dateArray = reqData.children.map(item => {
-                //     this.$set(item, 'duration', this.calcDuration(item.start, item.stop));
-                //     // item.duration = this.calcDuration(item.start, item.stop);
-                //     if (!reqData.duration) this.$set(reqData, 'duration', 0);
-                //     reqData.duration += item.duration;
-                //     let mixin = {
-                //         x: this.calculateX(item),
-                //         width: this.calculateWidth(item),
-                //         style: this.config.taskStyle
-                //     };
-                //     this.$set(item, 'mixin', mixin);
-                //     return item;
-                // });
-                // let date = this.sortDate(dateArray);
-                // reqData.start = moment(date[date.length - 1].start).format('YYYY-MM-DD HH:mm:ss');
-                reqData.children.forEach((item, dex) => {
-                    this.mixinToBaseData(item, dex);
+        mixinToBaseData (reqData) {
+            return reqData.map((item, index) => {
+                // 默认设置全部不展开
+                this.$set(item, 'expand', false);
+                if (item.start && item.stop) {
+                    this.$set(item, 'duration', this.calcDuration(item.start, item.stop));
+                }
+                this.$set(item, 'mixin', {
+                    x: this.calculateX(item), // 计算 任务的 left 定位
+                    width: this.calculateWidth(item), // 随着range的变化 计算 width的尺寸
+                    style: this.config.taskStyle
                 });
-            }
-            // 默认设置全部不展开
-            this.$set(reqData, 'expand', false);
-            if (reqData.start && reqData.stop) {
-                this.$set(reqData, 'duration', this.calcDuration(reqData.start, reqData.stop));
-            }
-            // 计算 任务的 left 定位
-            // 随着range的变化 计算 width的尺寸
-            this.$set(reqData, 'mixin', {
-                x: this.calculateX(reqData),
-                width: this.calculateWidth(reqData),
-                style: this.config.taskStyle
+                // 如果没有 唯一id 可以通过index设置id
+                this.$set(item, 'index', index);
+                if (item.children && item.children.length > 0) {
+                    this.mixinToBaseData(item.children);
+                }
+                return item;
             });
-            this.$set(reqData, 'index', index);
-            return reqData;
         },
         /** 递归去最小时间与最大时间
          * @param data
@@ -276,16 +254,6 @@ export default {
         calcContentBoxSize () {
             this.$refs.rightBox.calcContentBoxSize();
         },
-        expandRow (row) {
-            let index = this.baseData.data.findIndex(item => item.id === row.id);
-            let length = row.children.length;
-            this.expandData.index = index;
-            if (row.expand) {
-                this.expandData.length += length;
-            } else {
-                this.expandData.length -= length;
-            }
-        },
         /**
          * 融合自定义的配置
          */
@@ -336,24 +304,29 @@ export default {
         },
         calcMaxTime (maxDate) {
             let rightBox = this.$refs.rightBox;
+            let maxTime = this.calcData.range * this.config.minRangeNumber + this.calcData.min;
             if (rightBox) {
                 let rightWidth = this.$refs.rightBox.$el.clientWidth;
-                let max = Math.ceil(rightWidth / this.config.width) * this.calcData.range + this.calcData.min;
-                if (maxDate < max) {
-                    this.calcData.max = max;
-                    return max;
-                }
-                this.calcData.max = maxDate;
-                return maxDate;
+                let maxFromBox = Math.ceil(rightWidth / this.config.width) * this.calcData.range + this.calcData.min;
+                let max = [maxDate, maxTime, maxFromBox].sort((a, b) => b - a);
+                this.calcData.max = max[0];
+            } else {
+                let max = [maxDate, maxTime].sort((a, b) => b - a);
+                this.calcData.max = max[0];
             }
-            this.calcData.max = maxDate;
         }
     },
     created () {
         this.mixinConfig();
         let copyData = this.data.slice();
         this.baseData.data = this.dealData(copyData);
-        this.leftBaseData = this.baseData.data;
+    },
+    watch: {
+        data (n) {
+            let copyData = n.slice();
+            this.baseData.data = this.dealData(copyData);
+            this.$refs.rightBox.calcCells();
+        }
     },
     components: {leftCom, rightCom}
 };
