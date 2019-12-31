@@ -5,10 +5,12 @@
         width: 85%;
         height: 100%;
         overflow-x: hidden;
+        border-top: 1px solid #EBEEF5;
+        border-right: 1px solid #EBEEF5;
         .right-box-date-scroll {
             width: 100%;
             overflow: hidden;
-            background: #404040;
+            /*background: #404040;*/
         }
         .right-box-date{
             position: relative;
@@ -56,10 +58,13 @@
             border-right: 1px solid rgb(48, 48, 48);
         }
     }
+    .gantt-right-dark {
+        border-top: 1px solid #121820;
+    }
 </style>
 
 <template>
-    <div class="gantt-right">
+    <div :class="[themeDark && 'gantt-right-dark', 'gantt-right']">
         <div class="right-box-date-scroll" ref="dateScroll">
             <div class="right-box-date" ref="dateBox" :style="{width: calcData.boxWidth + 'px'}">
                 <div
@@ -79,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <div class="right-box-mask" :style="{width: 0 + 'px'}"></div>
+        <div v-if="showProgress" class="right-box-mask" :style="{width: 0 + 'px'}"></div>
     </div>
 </template>
 
@@ -88,7 +93,8 @@ import moment from 'moment';
 import rectCom from './rectCom';
 export default {
     name: 'rightCom',
-    props: ['data', 'calcData', 'config', 'expandData'],
+    props: ['theme', 'data', 'calcData', 'config', 'showProgress'],
+    inject: ['themeDark'],
     data () {
         return {
             cells: [], // 时间轴
@@ -119,29 +125,9 @@ export default {
         }
     },
     methods: {
-        calcY (dex) {
-            if (this.expandData.index) {
-                dex += this.expandData.length;
-            }
-            let top = dex * this.config.height + this.config.space * dex;
-            if (dex === 0) {
-                // 每个任务之间都有 边框 top的距离要加上 边框的宽度
-                top = this.config.space / 2;
-            } else if (dex > 0) {
-                top += dex;
-            }
-            return top;
-        },
-        cutLineY (dex) {
-            return this.calcY(dex) + this.config.height;
-        },
         calcCells (first = 0) {
             let arr = [];
-            let {min, max} = this.calcData;
-            max = this.calcData.rangeNum * this.calcData.range + min;
-            // for (let i = min; i <= max; i += this.calcData.range) {
-            //     arr.push(i);
-            // }
+            let {min} = this.calcData;
             for (let i = first; i <= this.config.minRangeNumber + first; i++) {
                 let date = min + this.calcData.range * i;
                 arr.push(date);

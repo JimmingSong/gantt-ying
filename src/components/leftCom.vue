@@ -1,7 +1,6 @@
 <style scoped lang="less">
     .left-container {
-        min-width: 200px;
-        /*padding-bottom: 10px;*/
+        min-width: 150px;
     }
     .gantt-left-table {
         height: 100%;
@@ -13,6 +12,7 @@
     }
     .gantt-table-cell {
         border-bottom-color: #4d4d4d;
+        padding: 3px 0;
         /deep/ & >.cell {
             line-height: 21px !important;
         }
@@ -23,6 +23,9 @@
     /deep/.gantt-left-table .el-table__body-wrapper{
         overflow-y: auto !important;
         overflow-x: scroll;
+    }
+    /deep/.gantt-left-table .el-table__empty-block {
+        background: transparent;
     }
 </style>
 
@@ -90,33 +93,6 @@ export default {
         },
         rowHeight () {
             return `height: ${this.config.height}px`;
-        },
-        leftBoxOut (e) {
-            e.target.style.cursor = 'default';
-        },
-        svgMouseMove (e) {
-            e.preventDefault();
-            if (e.target.clientWidth - e.offsetX <= 2) {
-                e.target.style.cursor = 'col-resize';
-            } else {
-                e.target.style.cursor = 'default';
-            }
-        },
-        svgMouseDown (e) {
-            e.preventDefault();
-            if (e.target.style.cursor === 'col-resize') {
-                let box = document.querySelector('.gantt-container');
-                box.onmousemove = (eve) => {
-                    eve.preventDefault();
-                    let boxX = box.getBoundingClientRect().left;
-                    let offsetX = eve.clientX - boxX;
-                    this.$emit('updateRightStyle', offsetX);
-                };
-                box.onmouseup = () => {
-                    this.$emit('calcContentBoxSize');
-                    box.onmousemove = null;
-                };
-            }
         },
         expandRow (row, expanded) {
             row.expand = expanded;

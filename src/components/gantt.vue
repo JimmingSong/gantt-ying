@@ -1,5 +1,15 @@
 <style scoped lang='less'>
-  @import "ganttCom.css";
+    .gantt-container {
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        color: #ffffff;
+        .gantt-right{
+            flex-grow: 1;
+            width: 80%;
+        }
+    }
   .tool {
       display: flex;
       align-items: center;
@@ -10,12 +20,15 @@
       height: 30px;
       width: 100px;
       z-index: 10;
-      background-image: linear-gradient(-90deg, #404040, #404040 70%, rgba(64, 64, 64, 0) 100%);
+      background-image: linear-gradient(-90deg, #b5b5b5, #e3e3e3 70%, rgba(209, 209, 209, 0) 100%);
 
       &>i {
           margin-right: 5px;
       }
   }
+    .tool-dark {
+        background-image: linear-gradient(-90deg, #404040, #404040 70%, rgba(64, 64, 64, 0) 100%);
+    }
 </style>
 
 <template>
@@ -24,8 +37,8 @@
             ref="leftBox"
             :data="jsonData"
             :config="config"
-            class="gantt-left_container"
-            :style="rightStyle"
+            class="gantt-left-container"
+            :style="leftStyle"
             @rowClick="rangeChartShow"
             @rowDoubleClick="showDialog"
             @updateRightStyle="updateRightStyle"
@@ -36,6 +49,7 @@
             :data="jsonData"
             :config="config"
             :calcData="calcData"
+            :current-time="currentTime"
             @dataSubmit="handleSubmit"
             @scrollEvent="scrollEvent"
             @updateRange="updateRange" />
@@ -54,6 +68,9 @@ import defaultConfig from './config';
 import moment from 'moment';
 export default {
     name: 'index',
+    provide: {
+        themeDark: 'themeDark'
+    },
     props: {
         data: {
             type: Array,
@@ -61,17 +78,34 @@ export default {
                 return [];
             }
         },
-        userConfig: {}
+        userConfig: {
+            type: Object,
+            default () {
+                return {};
+            }
+        },
+        currentTime: {
+            type: String,
+            default: '2019-12-19 21:20:00'
+        },
+        showProgress: {
+            type: Boolean,
+            default: false
+        },
+        customLeftStyle: {
+            type: Object
+        },
+        themeDark: {
+            type: Boolean,
+            default: true
+        }
     },
     data () {
         return {
-            cacheData: {
-                maxTime: new Date().getTime()
-            },
             baseData: {
                 data: []
             },
-            rightStyle: {
+            defaultLeftStyle: {
                 width: '15%'
             },
             config: defaultConfig,
@@ -91,14 +125,17 @@ export default {
     computed: {
         jsonData () {
             return this.baseData.data;
+        },
+        leftStyle () {
+            return {
+                ...this.defaultLeftStyle,
+                ...this.customLeftStyle
+            };
         }
     },
     methods: {
         handleSubmit (data) {
             this.$emit('handleSubmit', data);
-        },
-        updateCalcDataMax (data) {
-            this.calcData.max = data;
         },
         scrollEvent (top) {
             this.$refs.leftBox.scrollEvent(top);
@@ -173,9 +210,9 @@ export default {
             }
             this.calcData.min = minDate;
             this.calcMaxTime(maxDate);
-            this.cacheData.maxTime = maxDate;
             // 时间刻度的数量
             this.calcData.rangeNum = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
+            console.log(this.calcData.rangeNum);
             this.calcData.boxWidth = this.calcData.rangeNum * this.config.width;
         },
         mixinToBaseData (reqData) {
