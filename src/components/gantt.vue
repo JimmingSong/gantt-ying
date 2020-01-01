@@ -1,34 +1,5 @@
 <style scoped lang='less'>
-    .gantt-container {
-        position: relative;
-        display: flex;
-        width: 100%;
-        height: 100%;
-        color: #ffffff;
-        .gantt-right{
-            flex-grow: 1;
-            width: 80%;
-        }
-    }
-  .tool {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 30px;
-      width: 100px;
-      z-index: 10;
-      background-image: linear-gradient(-90deg, #b5b5b5, #e3e3e3 70%, rgba(209, 209, 209, 0) 100%);
-
-      &>i {
-          margin-right: 5px;
-      }
-  }
-    .tool-dark {
-        background-image: linear-gradient(-90deg, #404040, #404040 70%, rgba(64, 64, 64, 0) 100%);
-    }
+    @import './ganttCom.less';
 </style>
 
 <template>
@@ -68,9 +39,6 @@ import defaultConfig from './config';
 import moment from 'moment';
 export default {
     name: 'index',
-    provide: {
-        themeDark: 'themeDark'
-    },
     props: {
         data: {
             type: Array,

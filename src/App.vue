@@ -13,7 +13,6 @@
 <template>
   <div id="app">
     <Gantt ref="gantt" :data='ganttData' :userConfig='config' />
-    <button @click="change">click</button>
   </div>
 </template>
 

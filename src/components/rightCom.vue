@@ -1,70 +1,9 @@
 <style lang="less" scoped>
-    .gantt-right {
-        position: relative;
-        background: transparent;
-        width: 85%;
-        height: 100%;
-        overflow-x: hidden;
-        border-top: 1px solid #EBEEF5;
-        border-right: 1px solid #EBEEF5;
-        .right-box-date-scroll {
-            width: 100%;
-            overflow: hidden;
-            /*background: #404040;*/
-        }
-        .right-box-date{
-            position: relative;
-            width: 100%;
-            height: 30px;
-            &-text {
-                position: absolute;
-                bottom: 10px;
-                font-size: 12px;
-                color: #cccccc;
-            }
-
-            &-ticks {
-                position: absolute;
-                left: 0;
-                bottom: 3px;
-                width: 100%;
-                background-image: linear-gradient(90deg, #b5b5b5 1px, transparent 1px, transparent 100%);
-                background-repeat: repeat-x;
-            }
-
-            &-hight {
-                height: 10px;
-                background-size: 200px 100%;
-            }
-
-            &-short {
-                height: 5px;
-                background-size: 5px 100%;
-            }
-        }
-        &-box {
-            position: relative;
-            width: 100%;
-            height: calc(100% - 30px);
-            overflow: auto;
-            transform: scaleX(1);
-        }
-        .right-box-mask {
-            position: absolute;
-            top: 30px;
-            left: 0;
-            height: calc(100% - 42px);
-            background: rgba(36, 36, 36, 0.63);
-            border-right: 1px solid rgb(48, 48, 48);
-        }
-    }
-    .gantt-right-dark {
-        border-top: 1px solid #121820;
-    }
+    
 </style>
 
 <template>
-    <div :class="[themeDark && 'gantt-right-dark', 'gantt-right']">
+    <div class="gantt-right">
         <div class="right-box-date-scroll" ref="dateScroll">
             <div class="right-box-date" ref="dateBox" :style="{width: calcData.boxWidth + 'px'}">
                 <div
@@ -94,7 +33,6 @@ import rectCom from './rectCom';
 export default {
     name: 'rightCom',
     props: ['theme', 'data', 'calcData', 'config', 'showProgress'],
-    inject: ['themeDark'],
     data () {
         return {
             cells: [], // 时间轴

@@ -1,20 +1,5 @@
 <style scoped lang='less'>
-    .row {
-        position: relative;
-        width: 100%;
-        &-box {
-            position: relative;
-            width: 100%;
-            height: auto;
-            border-bottom: 1px solid #4d4d4d;
-            .row-range {
-                position: absolute;
-                top: 1.5px;
-                background-color: #7777bb;
-                border-radius: 3px;
-            }
-        }
-    }
+    
 </style>
 
 <template>
