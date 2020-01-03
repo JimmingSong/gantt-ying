@@ -116,13 +116,7 @@ export default {
       ]
     };
   },
-  methods: {
-    change () {
-      this.config.range = 1000 * 60 * 60;
-      this.$refs.gantt.updateRange(this.config.range);
-      console.log(this.config.range);
-    }
-  },
+  methods: {},
   components: {
     Gantt
   }

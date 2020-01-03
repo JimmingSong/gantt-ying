@@ -21,6 +21,7 @@
             :config="config"
             :calcData="calcData"
             :current-time="currentTime"
+            :rangeColor="rangeColor"
             @dataSubmit="handleSubmit"
             @scrollEvent="scrollEvent"
             @updateRange="updateRange" />
@@ -63,9 +64,9 @@ export default {
         customLeftStyle: {
             type: Object
         },
-        themeDark: {
-            type: Boolean,
-            default: true
+        rangeColor: {
+            type: String,
+            default: '#ddd'
         }
     },
     data () {

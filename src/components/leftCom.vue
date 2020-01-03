@@ -1,5 +1,33 @@
-<style lang="less" scoped>
-    
+<style scoped lang="less">
+    .left-container {
+        min-width: 150px;
+        /*padding-bottom: 10px;*/
+    }
+    .gantt-left-table {
+        height: 100%;
+        background-color: transparent;
+    }
+    /deep/.row {
+        cursor: pointer;
+        background: transparent;
+    }
+    .gantt-table-cell {
+        border-bottom-color: #4d4d4d;
+        padding: 3px 0;
+        /deep/ & >.cell {
+            line-height: 21px !important;
+        }
+    }
+    /deep/.row-expand-cover .el-table__expand-icon{
+        display: none;
+    }
+    /deep/.gantt-left-table .el-table__body-wrapper{
+        overflow-y: auto !important;
+        overflow-x: scroll;
+    }
+    /deep/.gantt-left-table .el-table__empty-block {
+        background: transparent;
+    }
 </style>
 
 <template>
@@ -25,8 +53,8 @@
             <el-table-column
                 v-for="(item, dex) in config.menu"
                 :key="dex"
+                header-align="center"
                 :prop="item.prop"
-                align="center"
                 :label="item.text">
             </el-table-column>
         </el-table>
@@ -59,7 +87,7 @@ export default {
             table.$el.querySelector('.el-table__body-wrapper').scroll(0, top);
         },
         rowClick (row) {
-            this.$emit('rowClick', row.index);
+            this.$emit('rowClick', row);
         },
         rowDbClick (row) {
             this.$emit('rowDbClick', row.index);
