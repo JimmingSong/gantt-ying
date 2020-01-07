@@ -1,5 +1,61 @@
 <style lang="less" scoped>
-    
+    .gantt-right {
+        position: relative;
+        background: transparent;
+        width: 85%;
+        height: 100%;
+        overflow-x: hidden;
+        .right-box-date-scroll {
+            width: 100%;
+            overflow: hidden;
+            background: #404040;
+        }
+        .right-box-date{
+            position: relative;
+            width: 100%;
+            height: 30px;
+            &-text {
+                position: absolute;
+                bottom: 10px;
+                font-size: 12px;
+                color: #cccccc;
+            }
+
+            &-ticks {
+                position: absolute;
+                left: 0;
+                bottom: 3px;
+                width: 100%;
+                background-image: linear-gradient(90deg, #b5b5b5 1px, transparent 1px, transparent 100%);
+                background-repeat: repeat-x;
+            }
+
+            &-hight {
+                height: 10px;
+                background-size: 200px 100%;
+            }
+
+            &-short {
+                height: 5px;
+                background-size: 5px 100%;
+            }
+        }
+        &-box {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 30px);
+            overflow: auto;
+            transform: scaleX(1);
+        }
+        .right-box-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: calc(100% - 12px);
+            background: rgba(36, 36, 36, 0.63);
+            border-right: 1px solid #c30000;
+        }
+    }
 </style>
 
 <template>
@@ -23,7 +79,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="showProgress" class="right-box-mask" :style="{width: 0 + 'px'}"></div>
+        <div v-if="showProgress" class="right-box-mask" :style="{width: progressWidth + 'px', left: progressLeft + 'px'}"></div>
     </div>
 </template>
 
@@ -32,12 +88,13 @@ import moment from 'moment';
 import rectCom from './rectCom';
 export default {
     name: 'rightCom',
-    props: ['theme', 'data', 'calcData', 'config', 'showProgress'],
+    props: ['data', 'calcData', 'config', 'expandData', 'currentTime', 'showProgress'],
     data () {
         return {
             cells: [], // 时间轴
-            boxWidth: 0,
             nowPos: 0,
+            progressWidth: 0,
+            progressLeft: 0,
             line: {
                 x: 100,
                 y1: 0,
@@ -63,6 +120,19 @@ export default {
         }
     },
     methods: {
+        calcY (dex) {
+            if (this.expandData.index) {
+                dex += this.expandData.length;
+            }
+            let top = dex * this.config.height + this.config.space * dex;
+            if (dex === 0) {
+                // 每个任务之间都有 边框 top的距离要加上 边框的宽度
+                top = this.config.space / 2;
+            } else if (dex > 0) {
+                top += dex;
+            }
+            return top;
+        },
         calcCells (first = 0) {
             let arr = [];
             let {min} = this.calcData;
@@ -95,9 +165,22 @@ export default {
             let dex = (millisecond - this.calcData.min) / this.calcData.range;
             return dex * this.config.width;
         },
+        /**
+         * 上下滚动
+         * @param top
+         */
         scrollEvent (top) {
-            this.$refs.rightCon.scroll(0, top);
+            let left = this.$refs.rightCon.scrollLeft;
+            this.$refs.rightCon.scroll(left, top);
+        },
+        scrollLeftRight (left) {
+            this.calcCells(Math.ceil(Math.abs(left) - 1));
+            this.$refs.dateScroll.scroll(left, 0);
+            this.$refs.rightCon.scroll(left, 0);
         }
+    },
+    created () {
+        this.progressWidth = this.dateShowLeft(moment(this.currentTime).valueOf());
     },
     mounted () {
         this.$nextTick().then(() => {
@@ -108,14 +191,20 @@ export default {
             let top = content.scrollTop;
             let left = content.scrollLeft;
             let leftNum = Math.ceil(left / this.config.width);
-            console.log(leftNum);
             if (this.nowPos !== leftNum) {
                 this.nowPos = leftNum;
                 this.calcCells(Math.ceil(Math.abs(leftNum) - 1));
             }
             this.$refs.dateScroll.scroll(left, 0);
+            this.progressLeft = -left;// 任务进度遮罩层的左边距 为了防止移动滚动条时 固定不动
             this.$emit('scrollEvent', top);
         });
+    },
+    watch: {
+        currentTime (val) {
+            val = val.replace(/[年月日]/g, '/');
+            this.progressWidth = this.dateShowLeft(moment(val).valueOf());
+        }
     },
     components: {rectCom}
 };

@@ -1,5 +1,5 @@
 export default {
-    menu: [{text: '任务名称', prop: 'text'}],
+    menu: [{text: '任务名称', prop: 'name'}],
     field: {
         start: 'start',
         stop: 'stop'

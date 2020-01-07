@@ -1,5 +1,21 @@
 <style scoped lang='less'>
-    @import './ganttCom.less';
+  @import "ganttCom.css";
+  .tool {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 30px;
+      width: 100px;
+      z-index: 10;
+      background-image: linear-gradient(-90deg, #404040, #404040 70%, rgba(64, 64, 64, 0) 100%);
+
+      &>i {
+          margin-right: 5px;
+      }
+  }
 </style>
 
 <template>
@@ -8,7 +24,7 @@
             ref="leftBox"
             :data="jsonData"
             :config="config"
-            class="gantt-left-container"
+            class="gantt-left_container"
             :style="leftStyle"
             @rowClick="rangeChartShow"
             @rowDoubleClick="showDialog"
@@ -21,9 +37,9 @@
             :config="config"
             :calcData="calcData"
             :current-time="currentTime"
-            :rangeColor="rangeColor"
             @dataSubmit="handleSubmit"
             @scrollEvent="scrollEvent"
+            :showProgress="showProgress"
             @updateRange="updateRange" />
         <div class="tool">
             <i class="el-icon-zoom-in" @click="handleRange('down')"></i>
@@ -40,6 +56,11 @@ import defaultConfig from './config';
 import moment from 'moment';
 export default {
     name: 'index',
+    provide () {
+        return {
+            calcData: this.calcData
+        };
+    },
     props: {
         data: {
             type: Array,
@@ -63,10 +84,6 @@ export default {
         },
         customLeftStyle: {
             type: Object
-        },
-        rangeColor: {
-            type: String,
-            default: '#ddd'
         }
     },
     data () {
@@ -79,7 +96,7 @@ export default {
             },
             config: defaultConfig,
             calcData: {
-                boxWidth: 0,
+                boxWidth: defaultConfig.minRangeNumber * defaultConfig.width,
                 range: defaultConfig.range,
                 rangeNum: defaultConfig.minRangeNumber,
                 max: 0,
@@ -106,6 +123,9 @@ export default {
         handleSubmit (data) {
             this.$emit('handleSubmit', data);
         },
+        updateCalcDataMax (data) {
+            this.calcData.max = data;
+        },
         scrollEvent (top) {
             this.$refs.leftBox.scrollEvent(top);
         },
@@ -122,19 +142,27 @@ export default {
         /**
          * tree的单击事件
          */
-        rangeChartShow (index) {
-            let data = this.baseData.data[index];
+        rangeChartShow (row) {
+            let data = row;
+            let start = moment(data.start).valueOf();
             console.log(data);
+            this.$refs.rightBox.scrollLeftRight(this.dateShowLeft(start));
+        },
+        dateShowLeft (millisecond) {
+            let dex = (millisecond - this.calcData.min) / this.calcData.range;
+            return dex * this.config.width;
         },
         /**
          * range 变化 触发事件
          */
         updateRange (newRange) {
             this.calcData.range = newRange;
-            this.calcData.rangeNum = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
-            this.calcData.boxWidth = this.calcData.rangeNum * this.config.width;
-            this.calcMaxTime(this.calcData.max);
-            this.dealData(this.baseData.data);
+            // this.calcData.rangeNum = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
+            // this.calcData.boxWidth = this.calcData.rangeNum * this.config.width;
+            // this.calcMaxTime(this.calcData.max);
+            // this.dealData(this.baseData.data);
+            // 调用计算最大时间与最小时间计算方法 不能全部处理 否则会自动折叠 导致与左边表格的折叠不一致
+            this.setMinAndMaxTime(this.baseData.data);
             this.$refs.rightBox.calcCells();
         },
         /**
@@ -181,8 +209,8 @@ export default {
             this.calcMaxTime(maxDate);
             // 时间刻度的数量
             this.calcData.rangeNum = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
-            console.log(this.calcData.rangeNum);
             this.calcData.boxWidth = this.calcData.rangeNum * this.config.width;
+            console.log(this.calcData.boxWidth);
         },
         mixinToBaseData (reqData) {
             return reqData.map((item, index) => {
