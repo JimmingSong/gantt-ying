@@ -40,6 +40,7 @@
             @dataSubmit="handleSubmit"
             @scrollEvent="scrollEvent"
             :showProgress="showProgress"
+            @rangeClick="rangeClick"
             @updateRange="updateRange" />
         <div class="tool">
             <i class="el-icon-zoom-in" @click="handleRange('down')"></i>
@@ -58,7 +59,9 @@ export default {
     name: 'index',
     provide () {
         return {
-            calcData: this.calcData
+            calcData: this.calcData,
+            getStart: this.getStart,
+            getEnd: this.getEnd
         };
     },
     props: {
@@ -123,6 +126,15 @@ export default {
         handleSubmit (data) {
             this.$emit('handleSubmit', data);
         },
+        getStart (data) {
+            return data[this.config.field.start];
+        },
+        getEnd (data) {
+            return data[this.config.field.stop];
+        },
+        getChildren (data) {
+            return data[this.config.field.children];
+        },
         updateCalcDataMax (data) {
             this.calcData.max = data;
         },
@@ -143,9 +155,8 @@ export default {
          * tree的单击事件
          */
         rangeChartShow (row) {
-            let data = row;
-            let start = moment(data.start).valueOf();
-            console.log(data);
+            let start = moment(this.getStart(row)).valueOf();
+            this.$emit('rangeClick', row);
             this.$refs.rightBox.scrollLeftRight(this.dateShowLeft(start));
         },
         dateShowLeft (millisecond) {
@@ -170,7 +181,7 @@ export default {
          */
         sortDate (array) {
             return array.sort((a, b) => {
-                return new Date(b.start).getTime() - new Date(a.start).getTime();
+                return new Date(this.getStart(b)).getTime() - new Date(this.getStart(a)).getTime();
             });
         },
         /**
@@ -192,8 +203,8 @@ export default {
             let maxDate;
             // 如果只有一条数据 取开始时间或者结束时间
             if (deepCopy.length === 1) {
-                let start = deepCopy[0][this.config.field.start];
-                let stop = deepCopy[0][this.config.field.stop];
+                let start = this.getStart(deepCopy[0]);
+                let stop = this.getEnd(deepCopy[0]);
                 minDate = moment(start).valueOf();
                 maxDate = moment(stop).valueOf();
             } else {
@@ -205,29 +216,20 @@ export default {
                 minDate = result.minDate;
                 maxDate = result.maxDate;
             }
-            this.calcData.min = minDate;
+            this.calcData.min = minDate - this.calcData.range;
             this.calcMaxTime(maxDate);
             // 时间刻度的数量
             this.calcData.rangeNum = Math.ceil((this.calcData.max - this.calcData.min) / this.calcData.range);
             this.calcData.boxWidth = this.calcData.rangeNum * this.config.width;
-            console.log(this.calcData.boxWidth);
         },
         mixinToBaseData (reqData) {
-            return reqData.map((item, index) => {
+            return reqData.map((item) => {
                 // 默认设置全部不展开
                 this.$set(item, 'expand', false);
-                if (item.start && item.stop) {
-                    this.$set(item, 'duration', this.calcDuration(item.start, item.stop));
-                }
-                this.$set(item, 'mixin', {
-                    x: this.calculateX(item), // 计算 任务的 left 定位
-                    width: this.calculateWidth(item), // 随着range的变化 计算 width的尺寸
-                    style: this.config.taskStyle
-                });
                 // 如果没有 唯一id 可以通过index设置id
-                this.$set(item, 'index', index);
-                if (item.children && item.children.length > 0) {
-                    this.mixinToBaseData(item.children);
+                let children = this.config.field.children;
+                if (item[children] && item[children].length > 0) {
+                    this.mixinToBaseData(item[children]);
                 }
                 return item;
             });
@@ -238,14 +240,15 @@ export default {
          */
         getMinAndMaxTime (data, result) {
             data.forEach(item => {
-                let start = moment(item.start).valueOf();
-                let end = moment(item.stop).valueOf();
+                let start = moment(this.getStart(item)).valueOf();
+                let end = moment(this.getEnd(item)).valueOf();
                 if (start <= result.minDate) {
                     result.minDate = start;
                 }
+                let children = this.config.field.children;
                 if (end >= result.maxDate) result.maxDate = end;
-                if (item.children && item.children.length > 0) {
-                    this.getMinAndMaxTime(item.children, result);
+                if (item[children] && item[children].length > 0) {
+                    this.getMinAndMaxTime(item[children], result);
                 }
             });
         },
@@ -272,7 +275,7 @@ export default {
          * @returns {number}
          */
         calculateX (item) {
-            let diff = moment(item.start).valueOf() - this.calcData.min;
+            let diff = moment(this.getStart(item)).valueOf() - this.calcData.min;
             return diff / this.calcData.range * 200;
         },
         /**
@@ -298,7 +301,7 @@ export default {
         handleRange (type) {
             let range = this.calcData.range;
             if (type === 'up') {
-                if (this.calcData.range >= 3600000) return;
+                if (this.calcData.range >= 7200000) return;
                 let rangeObj = {
                     '1000': 2000,
                     '2000': 5000,
@@ -312,7 +315,8 @@ export default {
                     '300000': 600000,
                     '600000': 1200000,
                     '1200000': 1800000,
-                    '1800000': 3600000
+                    '1800000': 3600000,
+                    '3600000': 7200000
                 };
                 range = rangeObj[range];
             } else {
@@ -330,7 +334,8 @@ export default {
                     '600000': 300000,
                     '1200000': 600000,
                     '1800000': 1200000,
-                    '3600000': 1800000
+                    '3600000': 1800000,
+                    '7200000': 3600000
                 };
                 range = rangeObj[range];
             }
@@ -348,6 +353,9 @@ export default {
                 let max = [maxDate, maxTime].sort((a, b) => b - a);
                 this.calcData.max = max[0];
             }
+        },
+        rangeClick (item) {
+            this.$emit('rangeClick', item);
         }
     },
     created () {

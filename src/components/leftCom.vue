@@ -48,12 +48,14 @@
             cell-class-name="gantt-table-cell"
             :header-cell-style="{padding: '3px 0'}"
             @row-click="rowClick"
+            :tree-props="{children: 'subTasks'}"
             @row-dblclick="rowDbClick"
             style="width: 100%">
             <el-table-column
                 v-for="(item, dex) in config.menu"
                 :key="dex"
                 header-align="center"
+                show-overflow-tooltip
                 :prop="item.prop"
                 :label="item.text">
             </el-table-column>

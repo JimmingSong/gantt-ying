@@ -46,6 +46,7 @@
             height: calc(100% - 30px);
             overflow: auto;
             transform: scaleX(1);
+            transition: scroll 500ms linear;
         }
         .right-box-mask {
             position: absolute;
@@ -54,6 +55,13 @@
             height: calc(100% - 12px);
             background: rgba(36, 36, 36, 0.63);
             border-right: 1px solid #c30000;
+            .mask-time {
+                position: absolute;
+                top: 50%;
+                right: 4px;
+                font-size: 14px;
+                color: @fontColor;
+            }
         }
     }
 </style>
@@ -75,11 +83,13 @@
         <div class="gantt-right-box" ref="rightCon">
             <div class="right-box-scroll" :style="{width: calcData.boxWidth + 'px'}">
                 <div class="right-box-range" style="height: calc(100% - 30px);" ref="content">
-                    <rectCom v-for="(item,dex) in data" :key="dex" :item="item" :config="config" />
+                    <rectCom v-for="(item,dex) in data" :key="dex" :item="item" :config="config" @rangeClick="rangeClick" />
                 </div>
             </div>
         </div>
-        <div v-if="showProgress" class="right-box-mask" :style="{width: progressWidth + 'px', left: progressLeft + 'px'}"></div>
+        <div v-if="showProgress" class="right-box-mask" :style="{width: progressWidth + 'px', left: progressLeft + 'px'}">
+            <span v-if="progressWidth > 0" class="mask-time">{{currentTime}}</span>
+        </div>
     </div>
 </template>
 
@@ -177,10 +187,14 @@ export default {
             this.calcCells(Math.ceil(Math.abs(left) - 1));
             this.$refs.dateScroll.scroll(left, 0);
             this.$refs.rightCon.scroll(left, 0);
+        },
+        rangeClick (item) {
+            this.$emit('rangeClick', item);
         }
     },
     created () {
-        this.progressWidth = this.dateShowLeft(moment(this.currentTime).valueOf());
+        let current = this.currentTime.replace(/[年月日]/g, '/');
+        this.progressWidth = this.dateShowLeft(moment(current).valueOf());
     },
     mounted () {
         this.$nextTick().then(() => {
@@ -202,6 +216,7 @@ export default {
     },
     watch: {
         currentTime (val) {
+            if (!this.showProgress) return;
             val = val.replace(/[年月日]/g, '/');
             this.progressWidth = this.dateShowLeft(moment(val).valueOf());
         }

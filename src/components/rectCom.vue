@@ -25,12 +25,12 @@
 <template>
     <div class="row">
         <div :style="{height: config.height + 'px'}" class="row-box">
-            <div :style="rangeStyle" class="row-range">
+            <div :style="rangeStyle" class="row-range" @click="rangeClick(item)">
                 <span>{{item.name}}</span>
             </div>
         </div>
         <div v-show="item.expand">
-            <rectCom v-for="(item, dex) in item.children" :key="dex" :item="item" :index="dex" :config="config" :expand-data="expandData"></rectCom>
+            <rectCom v-for="(item, dex) in item.subTasks" :key="dex" :item="item" :index="dex" :config="config" @rangeClick="rangeClick"></rectCom>
         </div>
     </div>
 </template>
@@ -39,8 +39,8 @@
 import moment from 'moment';
 export default {
     name: 'rectCom',
-    inject: ['calcData'],
-    props: ['config', 'item', 'index', 'boxWidth', 'expandData'],
+    inject: ['calcData', 'getStart', 'getEnd'],
+    props: ['config', 'item', 'index', 'boxWidth'],
     computed: {
         rangeStyle () {
             return {
@@ -65,8 +65,7 @@ export default {
          * @param item
          */
         calculateWidth (item) {
-            let duration = this.calcDuration(item.start, item.stop);
-            // let size = item.duration;
+            let duration = this.calcDuration(this.getStart(item), this.getEnd(item));
             return this.config.width * duration;
         },
         /**
@@ -75,8 +74,11 @@ export default {
          * @returns {number}
          */
         calculateX (item) {
-            let diff = moment(item.start).valueOf() - this.calcData.min;
+            let diff = moment(this.getStart(item)).valueOf() - this.calcData.min;
             return diff / this.calcData.range * 200;
+        },
+        rangeClick (item) {
+            this.$emit('rangeClick', item);
         }
     }
 };

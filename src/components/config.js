@@ -2,7 +2,8 @@ export default {
     menu: [{text: '任务名称', prop: 'name'}],
     field: {
         start: 'start',
-        stop: 'stop'
+        stop: 'stop',
+        children: 'children'
     },
     minRangeNumber: 10,
     width: 200,
