@@ -1,5 +1,5 @@
 <style scoped lang='less'>
-  @import "ganttCom.css";
+  @import "ganttCom";
   .tool {
       display: flex;
       align-items: center;
@@ -225,7 +225,7 @@ export default {
         mixinToBaseData (reqData) {
             return reqData.map((item) => {
                 // 默认设置全部不展开
-                this.$set(item, 'expand', false);
+                this.$set(item, 'expand', this.config.expandAll);
                 // 如果没有 唯一id 可以通过index设置id
                 let children = this.config.field.children;
                 if (item[children] && item[children].length > 0) {

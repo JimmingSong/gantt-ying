@@ -1,10 +1,11 @@
 export default {
-    menu: [{text: '任务名称', prop: 'name'}],
+    menu: [{text: '任务名称', prop: 'text'}], // 左侧菜单栏配置
     field: {
-        start: 'start',
-        stop: 'stop',
-        children: 'children'
+        start: 'start', // 开始时间
+        stop: 'stop', // 结束时间
+        children: 'children' // 存放子集的属性名称
     },
+    expandAll: false, // 默认是否展开所有
     minRangeNumber: 10,
     width: 200,
     headerHeight: 30,
@@ -26,5 +27,12 @@ export default {
     taskStyle: {
         cursor: 'default'
     },
-    childIsShow: true
+    childIsShow: true,
+    rangeField: {
+        text: 'text'
+    },
+    detailOption: {
+        show: false,
+        field: ['id', 'text', 'start', 'stop'],
+    }
 };

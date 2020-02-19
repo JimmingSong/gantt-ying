@@ -40,6 +40,7 @@
             border
             :indent="8"
             row-key="id"
+            :default-expand-all='config.expandAll'
             :header-row-style="{height: headerHeight}"
             :row-style="rowHeight"
             @expand-change="expandRow"
@@ -48,7 +49,7 @@
             cell-class-name="gantt-table-cell"
             :header-cell-style="{padding: '3px 0'}"
             @row-click="rowClick"
-            :tree-props="{children: 'subTasks'}"
+            :tree-props="{children: config.field.children, hasChildren: config.expand}"
             @row-dblclick="rowDbClick"
             style="width: 100%">
             <el-table-column

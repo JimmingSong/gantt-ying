@@ -60,7 +60,7 @@
                 top: 50%;
                 right: 4px;
                 font-size: 14px;
-                color: @fontColor;
+                color: #ccc;
             }
         }
     }
@@ -83,7 +83,17 @@
         <div class="gantt-right-box" ref="rightCon">
             <div class="right-box-scroll" :style="{width: calcData.boxWidth + 'px'}">
                 <div class="right-box-range" style="height: calc(100% - 30px);" ref="content">
-                    <rectCom v-for="(item,dex) in data" :key="dex" :item="item" :config="config" @rangeClick="rangeClick" />
+                    <rectCom
+                    v-for="(item,dex) in data"
+                    :key="dex"
+                    :item="item" 
+                    :index="dex"
+                    :config="config"
+                    :parent="data"
+                    :selectedIndex='selectedIndex'
+                    :selectedData='selectedData'
+                    @rangeClick="rangeClick"
+                    @updateSelectedData='updateSelectedData' />
                 </div>
             </div>
         </div>
@@ -105,15 +115,8 @@ export default {
             nowPos: 0,
             progressWidth: 0,
             progressLeft: 0,
-            line: {
-                x: 100,
-                y1: 0,
-                y2: 200,
-                style: {
-                    'stroke-width': 2,
-                    'stroke': '#6f6f6f'
-                }
-            }
+            selectedIndex: -1,
+            selectedData: {}
         };
     },
     computed: {
@@ -184,12 +187,18 @@ export default {
             this.$refs.rightCon.scroll(left, top);
         },
         scrollLeftRight (left) {
+            console.log(left, (Math.ceil(Math.abs(left) - 1)));
             this.calcCells(Math.ceil(Math.abs(left) - 1));
             this.$refs.dateScroll.scroll(left, 0);
             this.$refs.rightCon.scroll(left, 0);
+            
         },
         rangeClick (item) {
             this.$emit('rangeClick', item);
+        },
+        updateSelectedData (data) {
+            this.selectedIndex = data.index;
+            this.selectedData = data.item;
         }
     },
     created () {
