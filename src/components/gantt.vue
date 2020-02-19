@@ -234,7 +234,7 @@ export default {
                 return item;
             });
         },
-        /** 递归去最小时间与最大时间
+        /** 递归取最小时间与最大时间
          * @param data
          * @param result
          */

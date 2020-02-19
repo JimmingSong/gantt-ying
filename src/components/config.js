@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2019-12-25 22:27:12
+ * @LastEditTime: 2020-02-19 22:42:09
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \gantt-ying\src\components\config.js
+ */
 export default {
     menu: [{text: '任务名称', prop: 'text'}], // 左侧菜单栏配置
     field: {

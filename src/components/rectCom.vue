@@ -23,7 +23,20 @@
             display: none;
             position: absolute;
             border:6px solid transparent;
-            border-bottom-color: #4d4d4d
+            border-bottom-color: #4d4d4d;
+            .real-time {
+                display: none;
+            }
+            &:hover .real-time{
+                display: inline-block;
+                position: absolute;
+                top: -5px;
+                left: 130%;
+                color: #4d4d4d;
+                z-index: 1100;
+                min-width: 120px;
+                font-size: 12px;
+            }
         }
         .triangle-left {
             left: 0;
@@ -67,9 +80,9 @@
         @mouseenter="rangeMouseEnter(item,$event)"
         @mouseleave="rangeMouseOut"
       >
-        <i class="triangle triangle-left" @mousedown.prevent="leftTrangleMove"></i>
+        <i class="triangle triangle-left" @mousedown.prevent.self="leftTrangleMove($event, item)"><span class="real-time">{{realTimeStart}}</span></i>
         <span>{{ item[config.rangeField.text] }}</span>
-        <i class="triangle triangle-right" @mousedown.prevent="rightTrangleMove"></i>
+        <i class="triangle triangle-right" @mousedown.prevent.self="rightTrangleMove($event, item)"><span class="real-time">{{realTimeStop}}</span></i>
         <div class="row-detail-show" v-if="config.detailOption.show && detailBox.rangeDetail">
           <div v-for="(item, dex) in config.detailOption.field" :key="dex">
               <span>{{item}}</span>
@@ -85,7 +98,7 @@
         :item="children"
         :index="dex"
         :config="config"
-        :parent="children"
+        :parent="item"
         :selectedData="selectedData"
         @rangeClick="rangeClick"
         @updateSelectedData="updateSelectedData"
@@ -111,6 +124,8 @@ export default {
   data () {
       return {
           currentRow: {},
+          realTimeStart: '',
+          realTimeStop: '',
           detailBox: {
               rangeDetail: false,
               left: 0,
@@ -134,9 +149,7 @@ export default {
      * @param stop 结束时间
      */
     calcDuration(start, stop) {
-      let duration =
-        (moment(stop).valueOf() - moment(start).valueOf()) /
-        this.calcData.range;
+      let duration = (moment(stop).valueOf() - moment(start).valueOf()) / this.calcData.range;
       return Math.floor(duration * 100) / 100;
     },
     /**
@@ -160,6 +173,11 @@ export default {
     rangeClick(item) {
       this.$emit("rangeClick", item);
     },
+    /**
+     * @description: 拖拽交换任务的上下位置功能时 更新 需要的数据
+     * @param {type} 
+     * @return: 
+     */
     updateSelectedData(item, index) {
       this.$emit("updateSelectedData", { item, index });
     },
@@ -173,6 +191,14 @@ export default {
       this.parent.splice(this.selectedIndex, 1, item);
     },
     /**移动区 */
+    /**
+     * @description: 计算1px等于多少秒
+     * @param {type} 
+     * @return: 1px等于多少毫秒
+     */
+    secondsPx () {
+        return this.config.range / this.config.width;
+    },
     /**
      * @description: 拖动进度块
      * @param {type} 
@@ -200,44 +226,106 @@ export default {
      * @param {type} 
      * @return: 
      */
-    leftTrangleMove (e) {
+    leftTrangleMove (e, data) {
+        /**
+         * @description: 如果存在子集且子集的开始时间小于修改后的父集的开始时间 则以父集的开始时间作为开始时间
+         * @param {Object} data 当前任务数据
+         * @param {Object} star 移动后得到的开始时间
+         * @return: 
+         */
+        let handleChildrenStart = (data, star) => {
+            // 如果存在子集且子集的开始时间小于修改后的父集的开始时间 则以父集的开始时间作为开始时间
+            let children = this.config.field.children;
+            data[children] && data[children].forEach(item => {
+                if (moment(item[start]).valueOf() < star) {
+                    item[start] = moment(star).format('YYYY/MM/DD HH:mm:ss');
+                }
+                if (item[children] && item[children].length > 0) {
+                    handleChildrenStart(item[children]);
+                }
+            });
+        }
         // 整个任务显示容器
         let scrollDom = document.querySelector('.right-box-range');
         // 获取 任务显示容器 在当前显示器显示区域的坐标
         let box = document.querySelector('.right-box-scroll');
         let box_left = box.getBoundingClientRect().left;
         let parent = e.target.parentNode;
+        let parent_left = parent.getBoundingClientRect().left;
         // 记录 当前任务模块的 终点位置 当left位置变化时 补上 宽度
-        let endPos = parent.getBoundingClientRect().left + parent.clientWidth - box_left;
+        let endPos = parent_left + parent.clientWidth - box_left;
+        let stop = this.config.field.stop;
+        let start = this.config.field.start;
+        console.log(this.parent);
         scrollDom.onmousemove = (event) => {
             let mousePos = event.clientX;
-            let boxOffset = box.getBoundingClientRect().left;
-            let res_left = mousePos - boxOffset;
+            if (parent_left + parent.clientWidth - mousePos <= 5) return;
+            let boxOffset = box.getBoundingClientRect().left;// 获取容器在全视图中的定位
+            let res_left = mousePos - boxOffset; // 鼠标的坐标减去容器的x坐标 获得鼠标在容器中的x坐标
+            let diffResult = endPos - res_left; // 计算移动的差值
+            // 通过差值计算开始时间  结束时间没变 用结束时间减去开始时间
+            let seconds = this.secondsPx() * diffResult;
+            let star = moment(data[stop]).valueOf() - seconds;
+            this.realTimeStart = moment(star).format('YYYY/MM/DD HH:mm:ss');
+            // 如果拖拽子集后 子集的开始时间在所有子集中是最大的则父集的开始时间取子集的最大时间
+            let parentChildrenList = this.parent[this.config.field.children].slice();
+            let _parent = parentChildrenList.sort((a, b) => moment(a.start).valueOf() - moment(b.start).valueOf());
+            let minStart = _parent[0];
+            if (star <= moment(minStart.start).valueOf()) {
+                this.parent[start] = this.realTimeStart;
+            }
+            handleChildrenStart(data, star);
+            data[start] = moment(star).format('YYYY/MM/DD HH:mm:ss');
             parent.style.left = res_left + 'px';
             parent.style.width = endPos - res_left + 'px';
         }
         scrollDom.onmouseup = () => {
-            // TODO: 需要更新 当前任务的 开始时间
+            // // 需要更新 当前任务的 开始时间
+            // let mousePos = event.clientX;
+            // let boxOffset = box.getBoundingClientRect().left;
+            // let res_left = mousePos - boxOffset;
+            // let diffResult = endPos - res_left;
+            // let seconds = this.secondsPx() * diffResult;
+            // let star = moment(data[stop]).valueOf() - seconds;
+            // handleChildrenStart(data, star);
+            // data[start] = moment(star).format('YYYY/MM/DD HH:mm:ss');
             scrollDom.onmousemove = null;
+            scrollDom.onmouseup = null;
         }
     },
     /**
      * @description: 调整进度快的结束时间
      * @param {type} 
+     * @param {Object} data
      * @return: 
      */
-    rightTrangleMove (e) {
+    rightTrangleMove (e, data) {
         let scrollDom = document.querySelector('.right-box-range');
         let parent = e.target.parentNode;
+        let start = this.config.field.start;
+        let stop = this.config.field.stop;
         scrollDom.onmousemove = (event) => {
             let mousePos = event.clientX;
             let box = document.querySelector('.right-box-scroll');
             let boxOffset = box.getBoundingClientRect().left;
-            parent.style.width = mousePos - boxOffset - parent.style.left.replace('px', '') + 'px';
+            let width = mousePos - boxOffset - parent.style.left.replace('px', '');
+            let seconds = this.secondsPx() * parent.style.width.replace('px', '');
+            let end = moment(data[start]).valueOf() + seconds;
+            this.realTimeStop = moment(end).format('YYYY/MM/DD HH:mm:ss');
+            // 如果拖拽子集后 子集的开始时间在所有子集中是最大的则父集的开始时间取子集的最大时间
+            let parentChildrenList = this.parent[this.config.field.children].slice();
+            let _parent = parentChildrenList.sort((a, b) => moment(b.stop).valueOf() - moment(a.stop).valueOf());
+            console.log(_parent);
+            let minStart = _parent[0];
+            if (end > moment(minStart.stop).valueOf()) {
+                this.parent[stop] = this.realTimeStop;
+            }
+            data[stop] = moment(end).format('YYYY/MM/DD HH:mm:ss');
+            parent.style.width = width + 'px';
         }
         scrollDom.onmouseup = () => {
-            // TODO: 需要更新 当前任务的 结束时间
             scrollDom.onmousemove = null;
+            scrollDom.onmouseup = null;
         }
     },
     /**
@@ -250,6 +338,8 @@ export default {
         this.detailBox.rangeDetail = true;
         this.detailBox.left = e.offsetX;
         this.detailBox.top = e.offsetY;
+        this.realTimeStart = data[this.config.field.start];
+        this.realTimeStop = data[this.config.field.stop];
     },
     /**
      * @description: 鼠标移出事件  隐藏当前任务的详情面板
