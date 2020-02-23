@@ -187,10 +187,13 @@ export default {
             this.$refs.rightCon.scroll(left, top);
         },
         scrollLeftRight (left) {
-            console.log(left, (Math.ceil(Math.abs(left) - 1)));
-            this.calcCells(Math.ceil(Math.abs(left) - 1));
+            // 这个判断是防止 点击左边任务时 右边内容区域 与时间不同步问题 任务的时间得到的scrollLeft要超过 scrollLeft所能达到的最大值 内容区域就不会移动 会导致与时间不同步
+            if (left > this.calcData.boxWidth -  this.$refs.rightCon.clientWidth && this.$refs.rightCon.scrollLeft + this.$refs.rightCon.clientWidth >= this.calcData.boxWidth) return;
+            let leftNum = Math.ceil(left / this.config.width);
+            this.calcCells(Math.ceil(Math.abs(leftNum) - 1));
+            let top = this.$refs.rightCon.scrollTop;
             this.$refs.dateScroll.scroll(left, 0);
-            this.$refs.rightCon.scroll(left, 0);
+            this.$refs.rightCon.scroll(left, top);
             
         },
         rangeClick (item) {

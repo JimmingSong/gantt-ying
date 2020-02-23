@@ -26,6 +26,8 @@
             :config="config"
             class="gantt-left_container"
             :style="leftStyle"
+            :expand-row-keys="expandData.rowKeys"
+            @updateExpandRowKeys='updateExpandRowKeys'
             @rowClick="rangeChartShow"
             @rowDoubleClick="showDialog"
             @updateRightStyle="updateRightStyle"
@@ -106,6 +108,7 @@ export default {
                 min: 0
             },
             expandData: {
+                rowKeys: [],
                 index: null,
                 length: 0
             }
@@ -142,7 +145,16 @@ export default {
             this.$refs.leftBox.scrollEvent(top);
         },
         leftScrollEvent (top) {
+            console.log(top);
             this.$refs.rightBox.scrollEvent(top);
+        },
+        /** 更新列表
+         * @description: 
+         * @param {type} 
+         * @return: 
+         */
+        updateExpandRowKeys (key) {
+            this.expandData.rowKeys.includes(key) ? this.expandData.rowKeys.splice(this.expandData.rowKeys.indexOf(key), 1) : this.expandData.rowKeys.push(key);
         },
         /**
          * tree 的双击事件
@@ -226,6 +238,7 @@ export default {
             return reqData.map((item) => {
                 // 默认设置全部不展开
                 this.$set(item, 'expand', this.config.expandAll);
+                this.$set(item, 'selected', false);
                 // 如果没有 唯一id 可以通过index设置id
                 let children = this.config.field.children;
                 if (item[children] && item[children].length > 0) {
@@ -355,6 +368,7 @@ export default {
             }
         },
         rangeClick (item) {
+            this.updateExpandRowKeys(item.id);
             this.$emit('rangeClick', item);
         }
     },

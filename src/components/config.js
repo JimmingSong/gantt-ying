@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2019-12-25 22:27:12
- * @LastEditTime: 2020-02-19 22:42:09
+ * @LastEditTime: 2020-02-21 13:04:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \gantt-ying\src\components\config.js
@@ -13,6 +13,7 @@ export default {
         stop: 'stop', // 结束时间
         children: 'children' // 存放子集的属性名称
     },
+    showChildren: true, // 是否展示子集
     expandAll: false, // 默认是否展开所有
     minRangeNumber: 10,
     width: 200,

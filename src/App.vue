@@ -3,7 +3,6 @@
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
   height: 300px;
@@ -11,7 +10,8 @@
 }
 </style>
 <template>
-  <div id="app">
+  <div id="app" style="display: flex">
+    <!-- <div style="width: 300px; height: 300px">zhesh</div> -->
     <Gantt ref="gantt" :data='ganttData' :userConfig='config' />
   </div>
 </template>
@@ -37,7 +37,35 @@ export default {
               id: '1-1',
               text: '任务1-1',
               start: '2019/12/19 21:00:00',
-              stop: '2019/12/19 21:05:00'
+              stop: '2019/12/19 21:05:00',
+              children: [
+                {
+                  id: '2-1',
+                  text: '任务2-1',
+                  start: '2019/12/19 21:00:00',
+                  stop: '2019/12/19 21:05:00',
+                },
+                {
+                  id: '2-2',
+                  text: '任务2-2',
+                  start: '2019/12/19 21:05:00',
+                  stop: '2019/12/19 21:10:00',
+                  children: [
+                    {
+                      id: '3-1',
+                      text: '任务3-1',
+                      start: '2019/12/19 21:00:00',
+                      stop: '2019/12/19 21:05:00'
+                    },
+                    {
+                      id: '3-2',
+                      text: '任务3-2',
+                      start: '2019/12/19 21:05:00',
+                      stop: '2019/12/19 21:10:00'
+                    },
+                  ]
+                },
+              ]
             },
             {
               id: '1-2',
@@ -52,6 +80,20 @@ export default {
           text: '任务2',
           start: '2019/12/19 21:10:00',
           stop: '2019/12/19 21:20:00',
+          children: [
+            {
+              id: '1-1',
+              text: '任务1-1',
+              start: '2019/12/19 21:00:00',
+              stop: '2019/12/19 21:05:00'
+            },
+            {
+              id: '1-2',
+              text: '任务1-2',
+              start: '2019/12/19 21:05:00',
+              stop: '2019/12/19 21:10:00'
+            },
+          ]
         },
         {
           id: '2',

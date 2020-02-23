@@ -171,6 +171,7 @@ export default {
     },
     /** 拖拽区*/
     rangeClick(item) {
+      item.expand = !item.expand;
       this.$emit("rangeClick", item);
     },
     /**
@@ -268,11 +269,13 @@ export default {
             let star = moment(data[stop]).valueOf() - seconds;
             this.realTimeStart = moment(star).format('YYYY/MM/DD HH:mm:ss');
             // 如果拖拽子集后 子集的开始时间在所有子集中是最大的则父集的开始时间取子集的最大时间
-            let parentChildrenList = this.parent[this.config.field.children].slice();
-            let _parent = parentChildrenList.sort((a, b) => moment(a.start).valueOf() - moment(b.start).valueOf());
-            let minStart = _parent[0];
-            if (star <= moment(minStart.start).valueOf()) {
-                this.parent[start] = this.realTimeStart;
+            if (this.parent[this.config.field.children]) {
+              let parentChildrenList = this.parent[this.config.field.children].slice();
+              let _parent = parentChildrenList.sort((a, b) => moment(a.start).valueOf() - moment(b.start).valueOf());
+              let minStart = _parent[0];
+              if (star <= moment(minStart.start).valueOf()) {
+                  this.parent[start] = this.realTimeStart;
+              }
             }
             handleChildrenStart(data, star);
             data[start] = moment(star).format('YYYY/MM/DD HH:mm:ss');
@@ -313,12 +316,14 @@ export default {
             let end = moment(data[start]).valueOf() + seconds;
             this.realTimeStop = moment(end).format('YYYY/MM/DD HH:mm:ss');
             // 如果拖拽子集后 子集的开始时间在所有子集中是最大的则父集的开始时间取子集的最大时间
-            let parentChildrenList = this.parent[this.config.field.children].slice();
-            let _parent = parentChildrenList.sort((a, b) => moment(b.stop).valueOf() - moment(a.stop).valueOf());
-            console.log(_parent);
-            let minStart = _parent[0];
-            if (end > moment(minStart.stop).valueOf()) {
-                this.parent[stop] = this.realTimeStop;
+            if (this.parent[this.config.field.children]) {
+              let parentChildrenList = this.parent[this.config.field.children].slice();
+              let _parent = parentChildrenList.sort((a, b) => moment(b.stop).valueOf() - moment(a.stop).valueOf());
+              console.log(_parent);
+              let minStart = _parent[0];
+              if (end > moment(minStart.stop).valueOf()) {
+                  this.parent[stop] = this.realTimeStop;
+              }
             }
             data[stop] = moment(end).format('YYYY/MM/DD HH:mm:ss');
             parent.style.width = width + 'px';

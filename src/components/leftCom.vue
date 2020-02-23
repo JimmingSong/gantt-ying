@@ -1,38 +1,69 @@
 <style scoped lang="less">
-    .left-container {
-        min-width: 150px;
-        /*padding-bottom: 10px;*/
-    }
-    .gantt-left-table {
-        height: 100%;
-        background-color: transparent;
-    }
-    /deep/.row {
-        cursor: pointer;
-        background: transparent;
-    }
-    .gantt-table-cell {
-        border-bottom-color: #4d4d4d;
-        padding: 3px 0;
-        /deep/ & >.cell {
-            line-height: 21px !important;
-        }
-    }
-    /deep/.row-expand-cover .el-table__expand-icon{
-        display: none;
-    }
-    /deep/.gantt-left-table .el-table__body-wrapper{
-        overflow-y: auto !important;
-        overflow-x: scroll;
-    }
-    /deep/.gantt-left-table .el-table__empty-block {
-        background: transparent;
-    }
+.left-container {
+  min-width: 150px;
+  display: flex;
+  border-right: 1px solid #EBEEF5;
+  .left-heade{
+      text-align: center;
+      height: 30px;
+      border-bottom: 1px solid #EBEEF5;
+  }
+  .left-content {
+      height: calc(100% - 30px);
+      overflow-y: hidden;
+      overflow-x: scroll;
+  }
+}
+// .gantt-left-table {
+//     height: 100%;
+//     background-color: transparent;
+// }
+// /deep/.row {
+//     cursor: pointer;
+//     background: transparent;
+// }
+// .gantt-table-cell {
+//     border-bottom-color: #4d4d4d;
+//     padding: 3px 0;
+//     /deep/ & >.cell {
+//         line-height: 21px !important;
+//     }
+// }
+// /deep/.row-expand-cover .el-table__expand-icon{
+//     display: none;
+// }
+// /deep/.gantt-left-table .el-table__empty-block {
+//     background: transparent;
+// }
 </style>
 
 <template>
-    <div class="left-container">
-        <el-table
+  <div class="left-container">
+    <div
+      class="left-body"
+      v-for="(item, index) in config.menu"
+      :key="index"
+      :style="{ width: 100 / config.menu.length + '%' }"
+    >
+      <div class="left-heade">
+        <span>{{ item.text }}</span>
+      </div>
+      <div class="left-content" ref='content'>
+        <leftTable
+        v-for="(doc, dex) in data"
+        :key="dex"
+        :data="doc"
+        :dataDex='dex'
+        :index="index"
+        :config="config"
+        :value="item.prop"
+        :parent='data'
+        @rowClick='rowClick'
+        />
+      </div>
+    </div>
+
+    <!-- <el-table
             ref="leftTable"
             class="gantt-left-table"
             :data="data"
@@ -40,6 +71,7 @@
             border
             :indent="8"
             row-key="id"
+            :expand-row-keys='expandRowKeys'
             :default-expand-all='config.expandAll'
             :header-row-style="{height: headerHeight}"
             :row-style="rowHeight"
@@ -60,57 +92,57 @@
                 :prop="item.prop"
                 :label="item.text">
             </el-table-column>
-        </el-table>
-    </div>
+        </el-table> -->
+  </div>
 </template>
 
 <script>
+import leftTable from "./leftTable";
 export default {
-    name: 'leftCom',
-    props: ['data', 'config'],
-    data () {
-        return {
-            leftBaseData: this.data
-        };
+  name: "leftCom",
+  props: ["data", "config", "expandRowKeys"],
+  computed: {
+    arrowClass() {
+      return this.data.expand
+        ? "el-icon-arrow-right arrow arrow-open"
+        : "el-icon-arrow-right arrow arrow-close";
     },
-    computed: {
-        headerHeight () {
-            return this.config.headerHeight + 'px';
-        },
-        rowClassname () {
-            if (this.config.childIsShow) {
-                return 'row';
-            }
-            return 'row-expand-cover';
-        }
+    headerHeight() {
+      return this.config.headerHeight + "px";
     },
-    methods: {
-        scrollEvent (top) {
-            let table = this.$refs.leftTable;
-            table.$el.querySelector('.el-table__body-wrapper').scroll(0, top);
-        },
-        rowClick (row) {
-            this.$emit('rowClick', row);
-        },
-        rowDbClick (row) {
-            this.$emit('rowDbClick', row.index);
-        },
-        rowHeight () {
-            return `height: ${this.config.height}px`;
-        },
-        expandRow (row, expanded) {
-            row.expand = expanded;
-            this.$emit('expandRow', row);
-        }
-    },
-    mounted () {
-        this.$nextTick().then(() => {
-            let table = this.$refs.leftTable.$el.querySelector('.el-table__body-wrapper');
-            table.addEventListener('scroll', () => {
-                let scrollTop = table.scrollTop;
-                this.$emit('leftScrollEvent', scrollTop);
-            });
-        });
+    rowClassname() {
+      if (this.config.childIsShow) {
+        return "row";
+      }
+      return "row-expand-cover";
     }
+  },
+  methods: {
+    expandClick(data) {
+      data.expand = !data.expand;
+    },
+
+    scrollEvent(top) {
+      let table = this.$refs.content;
+      table[0].scroll(0, top);
+    },
+    rowClick(row) {
+      this.$emit("rowClick", row);
+    },
+    rowDbClick(row) {
+      this.$emit("rowDbClick", row.index);
+    },
+    rowHeight() {
+      return `height: ${this.config.height}px`;
+    },
+    expandRow(row, expanded) {
+      row.expand = expanded;
+      if (row.expand) {
+        this.$emit("updateExpandRowKeys", row.id);
+      }
+      this.$emit("expandRow", row);
+    }
+  },
+  components: { leftTable }
 };
 </script>
