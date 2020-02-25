@@ -1,6 +1,30 @@
 @borderColor: #EBEEF5;
 @textColor: #666;
-.gantt-container {
+/deep/.gantt-bgc-light {
+    background: #fff;
+}
+/deep/.gantt-bgc-dark {
+    background-color: #222;
+}
+/deep/.text-color-light {
+    color: #666666;
+}
+/deep/.text-color-dark {
+    color: #eeeeee;
+}
+/deep/.border-bottom-light {
+    border-bottom: 1px solid #EBEEF5;
+}
+/deep/.border-bottom-dark {
+    border-bottom: 1px solid #4d4d4d;
+}
+/deep/.border-right-light {
+    border-right: 1px solid #EBEEF5;
+}
+/deep/.border-right-dark {
+    border-right: 1px solid #4d4d4d;
+}
+/*.gantt-container {
     position: relative;
     display: flex;
     width: 100%;
@@ -118,7 +142,6 @@
                 position: relative;
                 width: 100%;
                 height: auto;
-                border-bottom: 1px solid @borderColor;
                 .row-range {
                     position: absolute;
                     top: 1.5px;
@@ -135,5 +158,5 @@
             }
         }
     }
-}
+}*/
 

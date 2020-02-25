@@ -67,11 +67,11 @@
 
 <template>
   <div class="row">
-    <div :style="{ height: config.height + 'px' }" class="row-box">
+    <div :style="{ height: config.height + 'px' }" :class="['row-box', 'border-bottom-' + config.theme]">
       <div
         :style="rangeStyle"
         class="row-range"
-        @click="rangeClick(item)"
+        @dblclick="rangeClick(item)"
         draggable
         @dragstart="rangeDragStart(item, index, $event)"
         @dragover.prevent="rangeDragOver"
@@ -172,12 +172,13 @@ export default {
     /** 拖拽区*/
     rangeClick(item) {
       item.expand = !item.expand;
-      this.$emit("rangeClick", item);
+      // this.$emit("rangeClick", item);
     },
     /**
      * @description: 拖拽交换任务的上下位置功能时 更新 需要的数据
-     * @param {type} 
-     * @return: 
+     * @param item {Object}
+     * @param index {Number}
+     * @return:
      */
     updateSelectedData(item, index) {
       this.$emit("updateSelectedData", { item, index });
@@ -194,7 +195,6 @@ export default {
     /**移动区 */
     /**
      * @description: 计算1px等于多少秒
-     * @param {type} 
      * @return: 1px等于多少毫秒
      */
     secondsPx () {
@@ -202,8 +202,7 @@ export default {
     },
     /**
      * @description: 拖动进度块
-     * @param {type} 
-     * @return: 
+     * @return:
      */
     rangeMove (e) {
         // 整个任务显示容器
@@ -224,15 +223,15 @@ export default {
     },
     /**
      * @description: 调整进度快的 开始时间
-     * @param {type} 
-     * @return: 
+     * @param {type}
+     * @return:
      */
     leftTrangleMove (e, data) {
         /**
          * @description: 如果存在子集且子集的开始时间小于修改后的父集的开始时间 则以父集的开始时间作为开始时间
          * @param {Object} data 当前任务数据
          * @param {Object} star 移动后得到的开始时间
-         * @return: 
+         * @return:
          */
         let handleChildrenStart = (data, star) => {
             // 如果存在子集且子集的开始时间小于修改后的父集的开始时间 则以父集的开始时间作为开始时间
@@ -298,9 +297,9 @@ export default {
     },
     /**
      * @description: 调整进度快的结束时间
-     * @param {type} 
+     * @param {type}
      * @param {Object} data
-     * @return: 
+     * @return:
      */
     rightTrangleMove (e, data) {
         let scrollDom = document.querySelector('.right-box-range');
@@ -336,7 +335,7 @@ export default {
     /**
      * @description: 鼠标移入事件 显示当前任务的详情面板 TODO:尚未完善
      * @param data {Object}
-     * @return: 
+     * @return:
      */
     rangeMouseEnter (data, e) {
         this.currentRow = data;
@@ -348,8 +347,8 @@ export default {
     },
     /**
      * @description: 鼠标移出事件  隐藏当前任务的详情面板
-     * @param {type} 
-     * @return: 
+     * @param {type}
+     * @return:
      */
     rangeMouseOut () {
         this.detailBox.rangeDetail = false;

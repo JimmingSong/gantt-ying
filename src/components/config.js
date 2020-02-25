@@ -7,6 +7,7 @@
  * @FilePath: \gantt-ying\src\components\config.js
  */
 export default {
+    theme: 'dark',
     menu: [{text: '任务名称', prop: 'text'}], // 左侧菜单栏配置
     field: {
         start: 'start', // 开始时间

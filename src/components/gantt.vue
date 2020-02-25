@@ -1,5 +1,29 @@
 <style scoped lang='less'>
   @import "ganttCom";
+  @borderColor: #EBEEF5;
+  @textColor: #666;
+  .gantt-bgc-light {
+      background: #fff;
+  }
+  .gantt-bgc-dark {
+      background-color: #222;
+  }
+  .text-color-light {
+      color: #666666;
+  }
+  .text-color-dark {
+      color: #eeeeee;
+  }
+  .gantt-container {
+      position: relative;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      .gantt-right {
+          flex-grow: 1;
+          width: 80%;
+      }
+  }
   .tool {
       display: flex;
       align-items: center;
@@ -19,7 +43,7 @@
 </style>
 
 <template>
-    <div class="gantt-container" ref="gantt">
+        <div :class="['gantt-container', 'text-color-'+ config.theme, 'gantt-bgc-' + config.theme]" ref="gantt">
         <leftCom
             ref="leftBox"
             :data="jsonData"
@@ -145,13 +169,12 @@ export default {
             this.$refs.leftBox.scrollEvent(top);
         },
         leftScrollEvent (top) {
-            console.log(top);
             this.$refs.rightBox.scrollEvent(top);
         },
         /** 更新列表
-         * @description: 
-         * @param {type} 
-         * @return: 
+         * @description:
+         * @param key {type}
+         * @return:
          */
         updateExpandRowKeys (key) {
             this.expandData.rowKeys.includes(key) ? this.expandData.rowKeys.splice(this.expandData.rowKeys.indexOf(key), 1) : this.expandData.rowKeys.push(key);

@@ -8,17 +8,15 @@
         .right-box-date-scroll {
             width: 100%;
             overflow: hidden;
-            background: #404040;
         }
         .right-box-date{
             position: relative;
             width: 100%;
-            height: 30px;
+            height: 29px;
             &-text {
                 position: absolute;
                 bottom: 10px;
                 font-size: 12px;
-                color: #cccccc;
             }
 
             &-ticks {
@@ -68,7 +66,7 @@
 
 <template>
     <div class="gantt-right">
-        <div class="right-box-date-scroll" ref="dateScroll">
+        <div :class="['right-box-date-scroll', 'border-bottom-'+config.theme]" ref="dateScroll">
             <div class="right-box-date" ref="dateBox" :style="{width: calcData.boxWidth + 'px'}">
                 <div
                     v-for="(item,dex) in dateList"
@@ -86,7 +84,7 @@
                     <rectCom
                     v-for="(item,dex) in data"
                     :key="dex"
-                    :item="item" 
+                    :item="item"
                     :index="dex"
                     :config="config"
                     :parent="data"
@@ -194,7 +192,7 @@ export default {
             let top = this.$refs.rightCon.scrollTop;
             this.$refs.dateScroll.scroll(left, 0);
             this.$refs.rightCon.scroll(left, top);
-            
+
         },
         rangeClick (item) {
             this.$emit('rangeClick', item);

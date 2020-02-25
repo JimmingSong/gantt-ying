@@ -10,8 +10,13 @@
     .table-box {
         .table-row {
             height: 21px;
-            border-bottom: 1px solid #EBEEF5;
             cursor: default;
+        }
+        .table-row-light {
+            border-bottom: 1px solid #EBEEF5;
+        }
+        .table-row-dark {
+            border-bottom: 1px solid #4d4d4d;
         }
     }
      .arrow {
@@ -26,7 +31,7 @@
  </style>
  <template>
      <div class="table-box">
-        <div class="table-row"
+        <div :class="['table-row', config.theme === 'dark' ? 'table-row-dark':'table-row-light']"
         :style="styleField"
         @click="rowClick(data)"
         >
