@@ -1,13 +1,14 @@
 /*
  * @Author: your name
  * @Date: 2019-12-25 22:27:12
- * @LastEditTime: 2020-02-21 13:04:44
+ * @LastEditTime: 2020-03-05 22:27:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \gantt-ying\src\components\config.js
  */
 export default {
     theme: 'dark',
+    // theme: 'light',
     menu: [{text: '任务名称', prop: 'text'}], // 左侧菜单栏配置
     field: {
         start: 'start', // 开始时间

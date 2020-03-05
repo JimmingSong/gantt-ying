@@ -32,7 +32,6 @@
                 position: absolute;
                 top: -5px;
                 left: 130%;
-                color: #4d4d4d;
                 z-index: 1100;
                 min-width: 120px;
                 font-size: 12px;
@@ -67,7 +66,7 @@
 
 <template>
   <div class="row">
-    <div :style="{ height: config.height + 'px' }" :class="['row-box', 'border-bottom-' + config.theme]">
+    <div :style="rangeBoxStyle" :class="['row-box', 'border-bottom-' + config.theme]">
       <div
         :style="rangeStyle"
         class="row-range"
@@ -80,9 +79,9 @@
         @mouseenter="rangeMouseEnter(item,$event)"
         @mouseleave="rangeMouseOut"
       >
-        <i class="triangle triangle-left" @mousedown.prevent.self="leftTrangleMove($event, item)"><span class="real-time">{{realTimeStart}}</span></i>
+        <i :style="triangleStyle" class="triangle triangle-left" @mousedown.prevent.self="leftTrangleMove($event, item)"><span class="real-time">{{realTimeStart}}</span></i>
         <span>{{ item[config.rangeField.text] }}</span>
-        <i class="triangle triangle-right" @mousedown.prevent.self="rightTrangleMove($event, item)"><span class="real-time">{{realTimeStop}}</span></i>
+        <i :style="triangleStyle" class="triangle triangle-right" @mousedown.prevent.self="rightTrangleMove($event, item)"><span class="real-time">{{realTimeStop}}</span></i>
         <div class="row-detail-show" v-if="config.detailOption.show && detailBox.rangeDetail">
           <div v-for="(item, dex) in config.detailOption.field" :key="dex">
               <span>{{item}}</span>
@@ -134,12 +133,26 @@ export default {
       }
   },
   computed: {
+    rangeBoxStyle() {
+      let style = {
+        height: this.config.height + 'px'
+      }
+      if (this.item.selected) {
+        style.backgroundColor = this.selectedBgc ? this.selectedBgc : this.config.theme === 'dark'? '#656464' : '#eee';
+      }
+      return style
+    },
     rangeStyle() {
       return {
         width: this.calculateWidth(this.item) + "px",
         left: this.calculateX(this.item) + "px",
         height: this.config.height - 4 + "px"
       };
+    },
+    triangleStyle () {
+      return {
+        borderBottomColor: this.config.theme === 'light'? '#4d4d4d' : '#999'
+      }
     }
   },
   methods: {
@@ -256,7 +269,6 @@ export default {
         let endPos = parent_left + parent.clientWidth - box_left;
         let stop = this.config.field.stop;
         let start = this.config.field.start;
-        console.log(this.parent);
         scrollDom.onmousemove = (event) => {
             let mousePos = event.clientX;
             if (parent_left + parent.clientWidth - mousePos <= 5) return;

@@ -113,6 +113,9 @@ export default {
         },
         customLeftStyle: {
             type: Object
+        },
+        selectedBgc: {
+            type: String
         }
     },
     data () {
