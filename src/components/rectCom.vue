@@ -330,7 +330,6 @@ export default {
             if (this.parent[this.config.field.children]) {
               let parentChildrenList = this.parent[this.config.field.children].slice();
               let _parent = parentChildrenList.sort((a, b) => moment(b.stop).valueOf() - moment(a.stop).valueOf());
-              console.log(_parent);
               let minStart = _parent[0];
               if (end > moment(minStart.stop).valueOf()) {
                   this.parent[stop] = this.realTimeStop;

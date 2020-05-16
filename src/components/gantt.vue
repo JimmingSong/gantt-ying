@@ -82,7 +82,7 @@ import rightCom from './rightCom';
 import defaultConfig from './config';
 import moment from 'moment';
 export default {
-    name: 'index',
+    name: 'GanttYing',
     provide () {
         return {
             calcData: this.calcData,
