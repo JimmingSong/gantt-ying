@@ -1,13 +1,19 @@
 {
   "name": "gantt-ying",
-  "version": "0.1.1",
-  "main": "dist/GanttYing.js",
+  "version": "0.1.4",
+  "main": "lib/GanttYing.common.js",
+  "author": "Jimmy",
+  "keyword": ["vue", "gantt"],
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "lib": "vue-cli-service build --target lib --name GanttYing --dest lib ganttYing/index.js"
   },
   "dependencies": {
+    "caniuse-lite": "^1.0.30001035",
     "core-js": "^3.4.3",
     "element-ui": "^2.13.0",
     "moment": "^2.24.0",

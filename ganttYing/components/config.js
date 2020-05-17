@@ -4,7 +4,7 @@
  * @LastEditTime: 2020-03-05 22:27:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
- * @FilePath: \gantt-ying\src\components\config.js
+ * @FilePath: \gantt-ying\packages\ganttYing\config.js
  */
 export default {
     theme: 'dark',

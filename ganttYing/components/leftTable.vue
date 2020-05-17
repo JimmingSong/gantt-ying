@@ -4,7 +4,7 @@
  * @LastEditTime: 2020-03-05 22:21:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
- * @FilePath: \gantt-ying\src\components\tree.vue
+ * @FilePath: \gantt-ying\packages\ganttYing\tree.vue
  -->
 <style lang="less">
 .table-box {

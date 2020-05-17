@@ -1,5 +1,5 @@
 <style scoped lang='less'>
-  @import "ganttCom";
+  @import "./ganttCom";
   @borderColor: #EBEEF5;
   @textColor: #666;
   .gantt-bgc-light {

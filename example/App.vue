@@ -12,13 +12,12 @@
 <template>
   <div id="app" style="display: flex">
     <!-- <div style="width: 300px; height: 300px">zhesh</div> -->
-    <Gantt ref="gantt" :data='ganttData' :userConfig='config' />
+    <!--<Gantt ref="gantt" :data='ganttData' :userConfig='config' />-->
+    <GanttYing :data="ganttData" :user-config="config" />
   </div>
 </template>
 
 <script>
-import Gantt from './components/gantt.vue'
-// import moduleName from './components/';
 export default {
   name: 'app',
   data () {
@@ -158,9 +157,5 @@ export default {
       ]
     };
   },
-  methods: {},
-  components: {
-    Gantt
-  }
 }
 </script>
