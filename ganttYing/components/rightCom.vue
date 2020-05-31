@@ -82,16 +82,16 @@
             <div class="right-box-scroll" :style="{width: calcData.boxWidth + 'px'}">
                 <div class="right-box-range" style="height: calc(100% - 30px);" ref="content">
                     <rectCom
-                    v-for="(item,dex) in data"
-                    :key="dex"
-                    :item="item"
-                    :index="dex"
-                    :config="config"
-                    :parent="data"
-                    :selectedIndex='selectedIndex'
-                    :selectedData='selectedData'
-                    @rangeClick="rangeClick"
-                    @updateSelectedData='updateSelectedData' />
+                        v-for="(item,dex) in data"
+                        :key="dex"
+                        :item="item"
+                        :index="dex"
+                        :config="config"
+                        :parent="data"
+                        :selectedIndex='selectedIndex'
+                        :selectedData='selectedData'
+                        @rangeClick="rangeClick"
+                        @updateSelectedData='updateSelectedData' />
                 </div>
             </div>
         </div>

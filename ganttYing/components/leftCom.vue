@@ -123,7 +123,7 @@ export default {
       return this.config.headerHeight + "px";
     },
     rowClassname() {
-      if (this.config.childIsShow) {
+      if (this.config.showChildren) {
         return "row";
       }
       return "row-expand-cover";
@@ -139,11 +139,6 @@ export default {
       table[0].scroll(0, top);
     },
     rowClick(row) {
-    //   if (!this.isChild) {
-    //     this.parent.forEach(item => {
-    //       item.selected = false;
-    //     });
-    //   }
       if (Object.keys(this.curData).length > 0) {
         this.curData.selected = false;
         this.preData = this.curData;

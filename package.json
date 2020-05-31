@@ -1,6 +1,6 @@
 {
   "name": "gantt-ying",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "main": "lib/GanttYing.common.js",
   "author": "Jimmy",
   "keyword": ["vue", "gantt"],
@@ -29,5 +29,6 @@
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
     "vue-template-compiler": "^2.6.10"
-  }
+  },
+  "description": "Gantt chart display component"
 }
