@@ -3,7 +3,10 @@
   "version": "0.1.6",
   "main": "lib/GanttYing.common.js",
   "author": "Jimmy",
-  "keyword": ["vue", "gantt"],
+  "keyword": [
+    "vue",
+    "gantt"
+  ],
   "private": false,
   "license": "MIT",
   "scripts": {

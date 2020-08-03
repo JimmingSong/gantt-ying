@@ -87,7 +87,8 @@ export default {
         return {
             calcData: this.calcData,
             getStart: this.getStart,
-            getEnd: this.getEnd
+            getEnd: this.getEnd,
+            draggable: this.draggable
         };
     },
     props: {
@@ -116,6 +117,10 @@ export default {
         },
         selectedBgc: {
             type: String
+        },
+        draggable: {
+            type: Boolean,
+            default: false
         }
     },
     data () {

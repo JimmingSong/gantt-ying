@@ -54,7 +54,9 @@
                     top: 100%;
                     transform: translate(50%, -75%);
                 }
+            }
 
+            .draggable-row {
                 &:hover .triangle {
                     display: inline;
                 }
@@ -79,8 +81,9 @@
             <div
                 :style="rangeStyle"
                 class="row-range"
+                :class="draggable && 'draggable-row'"
                 @dblclick="rangeClick(item)"
-                @mousedown.prevent.self="rangeMove($event, item)"
+                @mousedown.prevent.self="draggable && rangeMove($event, item)"
                 @mouseenter="rangeMouseEnter(item,$event)"
                 @mouseleave="rangeMouseOut"
             >
@@ -120,7 +123,7 @@
 
     export default {
         name: "rectCom",
-        inject: ["calcData", "getStart", "getEnd"],
+        inject: ["calcData", "getStart", "getEnd", "draggable"],
         props: [
             "config",
             "item",

@@ -21,6 +21,22 @@ npm install gantt-ying -S
    // 注册为全局组件
    Vue.use(ganttYing);
 ```
+ 属性说明
+* draggable
+
+```js
+draggable: true || false, 是否允许拖拽修改时间
+menu: [{}]
+```
+* 默认配置说明[config]
+
+```js
+{
+    theme: 'light' // 主题 light || dark 默认为light
+    
+}
+```
+
 * 默认数据格式
 ```
 [
