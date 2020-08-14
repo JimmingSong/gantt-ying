@@ -46,6 +46,7 @@
         <div :class="['gantt-container', 'text-color-'+ config.theme, 'gantt-bgc-' + config.theme]" ref="gantt">
         <leftCom
             ref="leftBox"
+            :menu="menu"
             :data="jsonData"
             :config="config"
             class="gantt-left_container"
@@ -102,6 +103,12 @@ export default {
             type: Object,
             default () {
                 return {};
+            }
+        },
+        menu: {
+            type: Array,
+            default () {
+                return [{text: '任务名称', prop: 'text'}];
             }
         },
         currentTime: {

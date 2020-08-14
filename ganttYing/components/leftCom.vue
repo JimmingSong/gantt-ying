@@ -45,7 +45,7 @@
   <div :class="['left-container', 'border-right-' + config.theme]">
     <div
       class="left-body"
-      v-for="(item, index) in config.menu"
+      v-for="(item, index) in menu"
       :key="index"
       :style="{ width: 100 / config.menu.length + '%' }"
     >
@@ -106,7 +106,7 @@ import leftTable from "./leftTable";
 
 export default {
   name: "leftCom",
-  props: ["data", "config", "expandRowKeys", "selectedBgc"],
+  props: ["data", "config", "expandRowKeys", "selectedBgc", "menu"],
   data() {
     return {
       preData: {},
