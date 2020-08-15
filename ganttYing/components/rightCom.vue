@@ -45,6 +45,12 @@
             overflow: auto;
             transform: scaleX(1);
             transition: scroll 500ms linear;
+            .right-box-scroll {
+                height: 100%;
+                .right-box-range {
+                    height: 100%;
+                }
+            }
         }
         .right-box-mask {
             position: absolute;
@@ -80,7 +86,7 @@
         </div>
         <div class="gantt-right-box" ref="rightCon">
             <div class="right-box-scroll" :style="{width: calcData.boxWidth + 'px'}">
-                <div class="right-box-range" style="height: calc(100% - 30px);" ref="content">
+                <div class="right-box-range" ref="content">
                     <rectCom
                         v-for="(item,dex) in data"
                         :key="dex"

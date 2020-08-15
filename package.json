@@ -1,7 +1,7 @@
 {
   "name": "gantt-ying",
-  "version": "0.1.7",
-  "main": "lib/GanttYing.common.js",
+  "version": "0.2.1",
+  "main": "lib/GanttYing.umd.min.js",
   "author": "Jimmy",
   "keyword": [
     "vue",
@@ -13,7 +13,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name GanttYing --dest lib ganttYing/index.js"
+    "lib": "cross-env NODE_ENV=production vue-cli-service build --target lib --name GanttYing --dest lib ganttYing/index.js"
   },
   "dependencies": {
     "caniuse-lite": "^1.0.30001035",
@@ -27,6 +27,7 @@
     "@vue/cli-plugin-eslint": "^4.1.0",
     "@vue/cli-service": "^4.1.0",
     "babel-eslint": "^10.0.3",
+    "cross-env": "^7.0.2",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "less": "^3.0.4",
