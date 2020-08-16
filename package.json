@@ -10,7 +10,7 @@
   "private": false,
   "license": "MIT",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "start": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "lib": "cross-env NODE_ENV=production vue-cli-service build --target lib --name GanttYing --dest lib ganttYing/index.js"

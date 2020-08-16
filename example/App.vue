@@ -13,7 +13,7 @@
     <div id="app" style="display: flex">
         <!-- <div style="width: 300px; height: 300px">zhesh</div> -->
         <!--<Gantt ref="gantt" :data="ganttData" :userConfig="config" />-->
-        <GanttYing :data="ganttData" :user-config="config"/>
+        <GanttYing :data="ganttData" :user-config="config" :showProgress='true' />
     </div>
 </template>
 

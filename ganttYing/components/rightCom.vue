@@ -56,7 +56,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            height: calc(100% - 12px);
+            height: calc(100% - 15px);
             background: rgba(36, 36, 36, 0.63);
             border-right: 1px solid #c30000;
             .mask-time {
