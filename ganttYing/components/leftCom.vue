@@ -13,7 +13,7 @@
 
   .left-content {
     height: calc(100% - 30px);
-    overflow-y: hidden;
+    overflow-y: auto;
     overflow-x: scroll;
   }
 }
@@ -52,7 +52,7 @@
       <div :class="['left-heade', 'border-bottom-' + config.theme]">
         <span>{{ item.text }}</span>
       </div>
-      <div class="left-content" ref="content">
+      <div class="left-content left-content-gantt-ying" ref="content">
         <leftTable
           v-for="(doc, dex) in data"
           :key="dex"
@@ -67,37 +67,6 @@
         />
       </div>
     </div>
-
-    <!-- <el-table
-                ref="leftTable"
-                class="gantt-left-table"
-                :data="data"
-                height="100%"
-                border
-                :indent="8"
-                row-key="id"
-                :expand-row-keys='expandRowKeys'
-                :default-expand-all='config.expandAll'
-                :header-row-style="{height: headerHeight}"
-                :row-style="rowHeight"
-                @expand-change="expandRow"
-                :row-class-name="rowClassname"
-                :cell-style="{padding: '0'}"
-                cell-class-name="gantt-table-cell"
-                :header-cell-style="{padding: '3px 0'}"
-                @row-click="rowClick"
-                :tree-props="{children: config.field.children, hasChildren: config.expand}"
-                @row-dblclick="rowDbClick"
-                style="width: 100%">
-                <el-table-column
-                    v-for="(item, dex) in config.menu"
-                    :key="dex"
-                    header-align="center"
-                    show-overflow-tooltip
-                    :prop="item.prop"
-                    :label="item.text">
-                </el-table-column>
-            </el-table> -->
   </div>
 </template>
 
@@ -160,6 +129,15 @@ export default {
       }
       this.$emit("expandRow", row);
     }
+  },
+  mounted () {
+      this.$nextTick().then(() => {
+        let table = document.querySelector('.left-content-gantt-ying');
+          table.addEventListener('scroll', () => {
+            let scrollTop = table.scrollTop;
+            this.$emit('leftScrollEvent', scrollTop);
+          });
+      });
   },
   components: { leftTable }
 };

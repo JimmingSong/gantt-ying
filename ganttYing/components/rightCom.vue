@@ -42,7 +42,8 @@
             position: relative;
             width: 100%;
             height: calc(100% - 30px);
-            overflow: auto;
+            overflow-x: auto;
+            overflow-y: hidden;
             transform: scaleX(1);
             transition: scroll 500ms linear;
             .right-box-scroll {
@@ -216,19 +217,19 @@ export default {
         this.$nextTick().then(() => {
             this.calcCells();
         });
-        let content = this.$refs.rightCon;
-        content.addEventListener('scroll', () => {
-            let top = content.scrollTop;
-            let left = content.scrollLeft;
-            let leftNum = Math.ceil(left / this.config.width);
-            if (this.nowPos !== leftNum) {
-                this.nowPos = leftNum;
-                this.calcCells(Math.ceil(Math.abs(leftNum) - 1));
-            }
-            this.$refs.dateScroll.scroll(left, 0);
-            this.progressLeft = -left;// 任务进度遮罩层的左边距 为了防止移动滚动条时 固定不动
-            this.$emit('scrollEvent', top);
-        });
+        // let content = this.$refs.rightCon;
+        // content.addEventListener('scroll', () => {
+        //     let top = content.scrollTop;
+        //     let left = content.scrollLeft;
+        //     let leftNum = Math.ceil(left / this.config.width);
+        //     if (this.nowPos !== leftNum) {
+        //         this.nowPos = leftNum;
+        //         this.calcCells(Math.ceil(Math.abs(leftNum) - 1));
+        //     }
+        //     this.$refs.dateScroll.scroll(left, 0);
+        //     this.progressLeft = -left;// 任务进度遮罩层的左边距 为了防止移动滚动条时 固定不动
+        //     this.$emit('scrollEvent', top);
+        // });
     },
     watch: {
         currentTime (val) {
